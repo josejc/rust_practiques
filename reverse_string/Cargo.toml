@@ -1,0 +1,6 @@
+[package]
+name = "reverse_string"
+version = "0.1.0"
+authors = ["José J. Cabezas <josej.cabezas@gmail.com>"]
+
+[dependencies]
