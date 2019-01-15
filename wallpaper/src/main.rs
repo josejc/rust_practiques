@@ -25,20 +25,26 @@ fn main() {
     print!("side? ");
     io::stdout().flush().unwrap();
     io::stdin().read_line(&mut entrada).expect("Error al llegir l'entrada",);
-    let side: f32 = entrada.trim().parse().expect("No és un nombre sencer",);
+    let side: f32 = entrada.trim().parse().expect("No és un nombre decimal",);
 
     // Create a new ImgBuf with width: imgx and height: imgy
     let mut imgbuf = image::ImageBuffer::new(imgx, imgy);
     let blanc = image::Rgb([255, 255, 255]);
     let negre = image::Rgb([0, 0, 0]);
+    let vermell = image::Rgb([255, 0, 0]);
+    let verd = image::Rgb([0, 255, 0]);
+    let blau = image::Rgb([0, 0, 255]);
 
     for i in 0..imgx {
         for j in 0..imgy {
             let x: f32 = (corna as f32 + ((i as f32 * side) / 100.0)) as f32;
             let y: f32 = (cornb as f32 + ((j as f32 * side) / 100.0)) as f32;
             let c: u32 = ((x * x) + (y * y)) as u32;
-            match c % 2 {
+            match c % 5 {
                 0 => imgbuf.put_pixel(i, j, blanc),
+                1 => imgbuf.put_pixel(i, j, vermell),
+                2 => imgbuf.put_pixel(i, j, verd),
+                3 => imgbuf.put_pixel(i, j, blau),
                 _ => imgbuf.put_pixel(i, j, negre),
             }
         }
