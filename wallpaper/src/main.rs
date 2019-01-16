@@ -15,13 +15,13 @@ fn main() {
     io::stdin().read_line(&mut entrada).expect("Error al llegir l'entrada",);
     let corna: u32 = entrada.trim().parse().expect("No és un nombre sencer",);
   
-    entrada = "".to_string();
+    entrada.clear();
     print!("cornb? ");
     io::stdout().flush().unwrap();
     io::stdin().read_line(&mut entrada).expect("Error al llegir l'entrada",);
     let cornb: u32 = entrada.trim().parse().expect("No és un nombre sencer",);
 
-    entrada = "".to_string();
+    entrada.clear();
     print!("side? ");
     io::stdout().flush().unwrap();
     io::stdin().read_line(&mut entrada).expect("Error al llegir l'entrada",);
