@@ -8,6 +8,10 @@ int main()
    for (i=1; i<25; i++){
       printf("%f, ", rand(1));
    }
+   printf("\n\n");
+   for (i=1; i<25; i++){
+      printf("%f, ", rand(2));
+   }
    printf("\n");
    return 0;
 }
