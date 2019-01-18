@@ -2,21 +2,21 @@ use std::io;
 use std::io::Write; // <--- bring flush() into scope
 
 pub struct LCG {
-    x: u32,
+    x: [u32; 101],
     a: u32,
     c: u32,
     m: u32,
 }
 
-pub fn rand(r: &mut LCG) -> f32 {
+pub fn rand(r: &mut LCG, segment: usize) -> f32 {
     //x = ((a * x) + c ) % m; Panic multiply with overflow
     let mut aux: u64;       // Solution to overflow of u32 
 
-    aux = r.a as u64 * r.x as u64;
+    aux = r.a as u64 * r.x[segment] as u64;
     aux = aux + r.c as u64;
     aux = aux % r.m as u64;
-    r.x = aux as u32;
-    (r.x as f32 / r.m as f32)
+    r.x[segment] = aux as u32;
+    (r.x[segment] as f32 / r.m as f32)
 }
 
 fn main() {
@@ -24,14 +24,15 @@ fn main() {
 
     let mut entrada = String::new();
     let n: u32; 
-    let mut r = LCG { x: 1_973_272_912, a: 630_360_016, c: 0, m: 2_147_483_647};
+    let mut r = LCG {x: [0; 101], a: 630_360_016, c: 0, m: 2_147_483_647};
+    r.x[1] = 1_973_272_912;
 
     print!("X0? [1.973.272.912] ");
     io::stdout().flush().unwrap();
     io::stdin().read_line(&mut entrada).expect("Error al llegir l'entrada",);
     entrada.pop();          // Remove CR last char ;)
     if !entrada.is_empty() {
-        r.x = entrada.trim().parse().expect("No és un nombre sencer [u32]",);
+        r.x[1] = entrada.trim().parse().expect("No és un nombre sencer [u32]",);
     }
   
     entrada.clear();
@@ -73,7 +74,7 @@ fn main() {
     }
 
     for _i in 0..n {
-        print!("{:.6}, ", rand(&mut r));
+        print!("{:.6}, ", rand(&mut r, 1));
     }
     println!("...");
 }
