@@ -6,11 +6,12 @@ fn main() {
 
     let mut entrada = String::new();
     let mut x: u32;
+    let mut u: f32;
     let mut aux: u64;   // Auxiliar per evitar overflow 
     let a: u32;
     let c: u32;
     let m: u32;
-    let n: u32;
+    let n: u32; 
 
     print!("X0? [1.973.272.912] ");
     io::stdout().flush().unwrap();
@@ -66,14 +67,14 @@ fn main() {
         n = entrada.trim().parse().expect("No és un nombre sencer [u32]",);
     }
 
-    print!("{}, ", x);
     for _i in 0..n {
         //x = ((a * x) + c ) % m; Panic multiply with overflow
         aux = a as u64 * x as u64;
         aux = aux + c as u64;
         aux = aux % m as u64;
         x = aux as u32;
-        print!("{}, ", x);
+        u = x as f32 / m as f32;
+        print!("{:.6}, ", u);
     }
     println!("...");
 }
