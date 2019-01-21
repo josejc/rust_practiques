@@ -9,14 +9,11 @@ impl LCG {
     // Initial seeds for a 100 streams
     pub fn new() -> LCG {
         let x = LCG::seeds();
-        let a: u32 = 630_360_016;
-        let c: u32 = 0;
-        let m: u32 = 2_147_483_647;
         LCG {
             x : x,
-            a : a,
-            c : c,
-            m : m,
+            a : 630_360_016,
+            c : 0,
+            m : 2_147_483_647,
         }   
     }
 

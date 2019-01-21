@@ -18,7 +18,7 @@ fn main() {
     io::stdin().read_line(&mut entrada).expect("Error al llegir l'entrada",);
     entrada.pop();
     if !entrada.is_empty() {
-        stream = entrada.trim().parse().expect("No és un nombre sencer [u32]",);
+        stream = entrada.trim().parse().expect("No és un nombre sencer [usize]",);
     }
     entrada.clear();
     print!("n secuència a generar? [25]");
@@ -26,7 +26,7 @@ fn main() {
     io::stdin().read_line(&mut entrada).expect("Error al llegir l'entrada",);
     entrada.pop();
     if !entrada.is_empty() {
-        n = entrada.trim().parse().expect("No és un nombre sencer [u32]",);
+        n = entrada.trim().parse().expect("No és un nombre sencer [usize]",);
     }
 
     for _i in 0..n {
