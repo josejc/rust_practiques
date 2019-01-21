@@ -1,14 +1,17 @@
 pub struct LCG {
     pub x: [u32; 101],
-    pub a: u32,
-    pub c: u32,
-    pub m: u32,
+    a: u32,
+    c: u32,
+    m: u32,
 }
 
 impl LCG {
     // Initial seeds for a 100 streams
-    pub fn new(a: u32, c: u32, m: u32) -> LCG {
+    pub fn new() -> LCG {
         let x = LCG::seeds();
+        let a: u32 = 630_360_016;
+        let c: u32 = 0;
+        let m: u32 = 2_147_483_647;
         LCG {
             x : x,
             a : a,
