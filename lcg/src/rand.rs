@@ -45,7 +45,7 @@ impl LCG {
     }
 
     // Return the integer actual of sequence in this stream
-    pub fn randgt(self, stream: usize) -> u32 {
+    pub fn randgt(&self, stream: usize) -> u32 {
         self.x[stream]
     }
 
