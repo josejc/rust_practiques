@@ -5,3 +5,4 @@ authors = ["josej <josej.cabezas@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+unicode-segmentation="0.1.2"
