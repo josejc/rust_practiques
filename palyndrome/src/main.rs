@@ -53,13 +53,14 @@ fn main() {
     }
     cadena = cadena.to_lowercase();
 
-    let middle = cadena.len()/2;
+    let mut middle = cadena.len()/2;
     let davant = &cadena[0..middle];
-    let mut darrera = &cadena[middle..];
     // (cadena.len() & 1) == 1 check odd
+    // 2*middle < cadena.len() also check odd
     if (cadena.len() % 2) == 1 {
-        darrera = &cadena[middle+1..];
+        middle += 1;
     }
+    let darrera = &cadena[middle..];    
     let arerrad: String = darrera
         // Split the string into an Iterator of &strs, where each element is an
         // extended grapheme cluster.
