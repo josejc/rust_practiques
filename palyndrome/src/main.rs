@@ -22,7 +22,7 @@ fn main() {
     let mut palyndrome = true;
 
     if !cadena.is_ascii() {
-        panic!("Not prepare for Unicode :-p");
+        panic!("This input is not prepare for Unicode :-p");
     }
     
      while cadena.len() > 1 {
@@ -35,9 +35,9 @@ fn main() {
     }
 
     if palyndrome {
-        println!("Is a palyndrome");
+        println!("Ascii sentence is a palyndrome");
     } else {
-        println!("Is not a palyndrome");
+        println!("Ascii sentence is not a palyndrome");
     }
 
     entrada.clear();
@@ -52,7 +52,15 @@ fn main() {
         cadena.push_str(word);
     }
     cadena = cadena.to_lowercase();
-    let anedac: String = cadena
+
+    let middle = cadena.len()/2;
+    let davant = &cadena[0..middle];
+    let mut darrera = &cadena[middle..];
+    // (cadena.len() & 1) == 1 check odd
+    if (cadena.len() % 2) == 1 {
+        darrera = &cadena[middle+1..];
+    }
+    let arerrad: String = darrera
         // Split the string into an Iterator of &strs, where each element is an
         // extended grapheme cluster.
         .graphemes(true)
@@ -66,9 +74,14 @@ fn main() {
         // clusters.
         .flat_map(|g| g.chars())
         // Collect all the chars into a new owned String.
-        .collect();
+        .collect();     
 
-    println!("unicode: {}", cadena);
-    println!("edocinu: {}", anedac);
- 
+    //println!("uni: {}", davant);
+    //println!("edo: {}", arerrad);
+    if davant == arerrad {
+        println!("Unicode sentence is a palyndrome");
+    } else {
+        println!("Unicode sentence is not a palyndrome");
+    }
+
 }
