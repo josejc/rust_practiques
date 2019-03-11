@@ -2,7 +2,7 @@ use std::io;
 use std::io::Write; // <--- bring flush() into scopeo
 
 fn equals(n: usize, e: [usize; 17]) -> bool {
-    for i in 1..n {             // REMEMBER for need plus one at end
+    for i in 1..n {             // REMEMBER "for" need plus one at index_end
         for j in i+1..n+1 {
             //println!("--e{}:{},e{}:{},",i,e[i],j,e[j]);        
             if e[i] == e[j] {
