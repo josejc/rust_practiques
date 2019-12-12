@@ -24,6 +24,20 @@ procedure generate(k : integer, A : array of any):
     end if
 */
 
+fn ini(size: usize) -> Vec<usize> {
+    let mut v: Vec<usize> = Vec::with_capacity(size);
+    for i in 1..size+1 {
+        v.push(i);
+    }
+    return v;
+}
+
+fn vprint(v: &Vec<usize>) {
+    for (i, x) in v.iter().enumerate() {
+        println!("In position {} we have value {}", i, x);
+    }
+}
+
 fn main() {
     println!("Generate permutations of n elements");
 
@@ -41,7 +55,15 @@ fn main() {
         panic!("Error: n must be in (0 < n < 17)");
     }
 
-
     println!("Permutacions de {} elements {{1,2,3..}}", n);
+    // Initialize vector for generate the permutations
+    let mut v = ini(n);
+    vprint(&v);
+    // Permutation of the elements
+    v.swap(1,2);
+    vprint(&v);
+
+
+
 
 }
