@@ -1,41 +1,49 @@
 use std::io;
 use std::io::Write; // <--- bring flush() into scope
 
-/* Heap's algorithm (https://en.wikipedia.org/wiki/Heap%27s_algorithm)
-procedure generate(k : integer, A : array of any):
-    if k = 1 then
-        output(A)
+
+// Heap's algorithm (https://en.wikipedia.org/wiki/Heap%27s_algorithm)
+fn generate(k: usize, a: &mut Vec<usize>) {
+    let is_even = |x| x % 2 == 0;
+
+    if k == 1 {
+        hprint(a);
+    }
     else
+    {
         // Generate permutations with kth unaltered
         // Initially k == length(A)
-        generate(k - 1, A)
+        generate(k-1, a);
 
         // Generate permutations for kth swapped with each k-1 initial
-        for i := 0; i < k-1; i += 1 do
+        for i in 0..k-1 {
             // Swap choice dependent on parity of k (even or odd)
-            if k is even then
-                swap(A[i], A[k-1]) // zero-indexed, the kth is at k-1
+            if is_even(k) {
+                a.swap(i,k-1);          // zero-indexed, the kth is at k-1
+            }
             else
-                swap(A[0], A[k-1])
-            end if
-            generate(k - 1, A)
-
-        end for
-    end if
-*/
-
-fn ini(size: usize) -> Vec<usize> {
-    let mut v: Vec<usize> = Vec::with_capacity(size);
-    for i in 1..size+1 {
-        v.push(i);
+            {
+                a.swap(0,k-1);
+            }
+            generate(k-1, a);
+        }
     }
-    return v;
 }
 
+fn initialize<T>(count: usize, f: fn(usize) -> T) -> Vec<T> {
+    (0..count).map(f).collect()
+}
+
+/*
 fn vprint(v: &Vec<usize>) {
     for (i, x) in v.iter().enumerate() {
         println!("In position {} we have value {}", i, x);
     }
+}
+*/
+
+fn hprint(v: &Vec<usize>) {
+    println!("{:?}",v);
 }
 
 fn main() {
@@ -51,19 +59,13 @@ fn main() {
     if !entrada.is_empty() {
         n = entrada.trim().parse().expect("No és un nombre sencer [usize]",);
     }
-    if (n<1) || (n>16) {
-        panic!("Error: n must be in (0 < n < 17)");
+    if n>16 {
+        panic!("Error: n must be in (0 <= n < 17)");
     }
 
-    println!("Permutacions de {} elements {{1,2,3..}}", n);
+    println!("Permutacions de {} elements {{0,1,2,3..}}", n);
     // Initialize vector for generate the permutations
-    let mut v = ini(n);
-    vprint(&v);
+    let mut v = initialize(n, |i| i as usize);
     // Permutation of the elements
-    v.swap(1,2);
-    vprint(&v);
-
-
-
-
+    generate(n, &mut v);
 }
