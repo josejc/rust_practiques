@@ -1,4 +1,6 @@
 use std::collections::HashSet;
+use std::io;
+use std::io::Read;
 
 const N: usize = 9;
 
@@ -57,66 +59,76 @@ fn pendent_sub(s: [[u8; N]; N], row: usize, col: usize) -> HashSet<u8> {
     return diff; 
 }
 
+fn entrada(s: &mut [[u8; N]; N]) {
+    let mut entrada = String::new();
+
+    io::stdin().read_to_string(&mut entrada).expect(
+        "Error al llegir l'entrada",
+    );
+
+    let linea = entrada.lines().enumerate();
+    for i in linea {
+        if i.0 > 8 {
+            panic!("Error a l'entrada, no podem processar més de 9 linees.");
+        }
+        if (i.0 == 0) && (i.1.len() > 9) {   // Format.. Tot a una única linea amb punts per les cel.les buides
+            if i.1.len() != 81 {
+                panic!("Error a l'entrada, la linea ha de ser de 81 caràcters, només . i del 1 al 9.")
+            }
+            for j in i.1.chars().enumerate() {
+                let x = j.0 / 9;
+                let y = j.0 % 9;
+                if j.1 == '.' {
+                    s[x][y] = 0;
+                } else {
+                    let digit: u32 = j.1.to_digit(10).unwrap();
+                    //println!("Linea {}, Caracter {}, u32 {}, u8 {}", i.0, j.0, digit, (digit & 0xff) as u8);
+                    s[x][y] = (digit & 0xff) as u8;     // u32 as 4 bytes, u8 as 1 byte (transform only last byte)
+                }    
+            }
+        } else {
+            // Format 9 lineas, amb 9 caràcters i les cel.les buides son un 0
+            if i.1.len() != 9 {
+                panic!("Error a l'entrada, la linea ha de ser de 9 caràcters, només del 0 al 9.");
+            }
+            for j in i.1.chars().enumerate() {
+                let digit: u32 = j.1.to_digit(10).unwrap();
+                //println!("Linea {}, Caracter {}, u32 {}, u8 {}", i.0, j.0, digit, (digit & 0xff) as u8);
+                s[i.0][j.0] = (digit & 0xff) as u8;     // u32 as 4 bytes, u8 as 1 byte (transform only last byte)
+            }
+        }    
+    }
+}
+
+fn imprimir(s: [[u8; N]; N]) {
+    for (i, row) in s.iter().enumerate() {
+        if (i % 3) == 0 {
+            println!("+-------+-------+-------+");
+        }
+        for (j, col) in row.iter().enumerate() {
+            if (j % 3) == 0 {
+                print!("| ");
+            }
+            if *col == 0 {
+                print!(". ");
+            } else { 
+                print!("{} ", col);
+            }
+        }
+        println!("|");
+    }
+    println!("+-------+-------+-------+");   
+}
+
 
 fn main() {
     
     let mut sudoku = [[0 as u8; N] ; N];
-    // Static sudoku; TODO, Read from keyboard or file
-    sudoku[0][2] = 3;
-    sudoku[0][4] = 2;
-    sudoku[0][7] = 6;
-
-    sudoku[1][0] = 9;
-    sudoku[1][3] = 3;
-    sudoku[1][5] = 5;
-    sudoku[1][8] = 1;
-
-    sudoku[2][2] = 1;
-    sudoku[2][3] = 8;
-    sudoku[2][5] = 6;
-    sudoku[2][6] = 4;
-
-    sudoku[3][2] = 8;
-    sudoku[3][3] = 1;   
-    sudoku[3][5] = 2;
-    sudoku[3][6] = 9;
-
-    sudoku[4][0] = 7;
-    sudoku[4][8] = 8;
-
-    sudoku[5][2] = 6;
-    sudoku[5][3] = 7;
-    sudoku[5][5] = 8;
-    sudoku[5][6] = 2;
-
-    sudoku[6][2] = 2;
-    sudoku[6][3] = 6;
-    sudoku[6][5] = 9;
-    sudoku[6][6] = 5;
-
-    sudoku[7][0] = 8;
-    sudoku[7][3] = 2;
-    sudoku[7][5] = 3;
-    sudoku[7][8] = 9;
-
-    sudoku[8][2] = 5;
-    sudoku[8][4] = 1;
-    sudoku[8][6] = 3;
-
-    //let mut possibilitats: [[HashSet<u8>;N];N];    // Per a cada cel.la del sudoku hem de calcular les seves possibilitats
+    entrada(&mut sudoku);
 
     println!("Inici:");
-    for (_i, row) in sudoku.iter().enumerate() {
-        println!("{:?}", row);
-    }
+    imprimir(sudoku);
 
-    //pendent_fila(sudoku[0]);
-    //pendent_fila(sudoku[8]);
-
-    //pendent_columna(sudoku, 1);
-    //pendent_columna(sudoku, 2); 
-
-    //pendent_sub(sudoku, 3, 4);
     let mut fi = false;
     let mut complet = true;
     while !fi {
@@ -138,22 +150,20 @@ fn main() {
                         sudoku[i][j] = number;
                         canvi = true;
                     } else {
-                        complet = false;
+                        complet = false;    // Encara no complet pq no hem pogut assignar res a aquesta cel.la
                     }
                 }
             }
         }
-        if !canvi {
+        if !canvi {     // Si no podem fer canvis aleshores a lo millor es que hem finalitzat?
             fi = true;
         }
     }
 
     println!("Final:");
-    for (_i, row) in sudoku.iter().enumerate() {
-        println!("{:?}", row);
-    }
+    imprimir(sudoku);
 
-    if !complet {
+    if !complet {       // Encara hi ha cel.les buides (amb 0)
         println!("Sudoku no finalitzat...");
         for i in 0..9 {
             for j in 0..9 {
@@ -161,7 +171,7 @@ fn main() {
                     let f = pendent_fila(sudoku[i]);    //i
                     let c = pendent_columna(sudoku, j); //j
                     let s = pendent_sub(sudoku, i, j);  //i,j
-                    let m: HashSet<u8>  = f.intersection(&c).cloned().collect();
+                    let m: HashSet<u8> = f.intersection(&c).cloned().collect();
                     let p: HashSet<u8> = m.intersection(&s).cloned().collect();
                     println!("Possibilitats posició {}, {}: {:?}", i, j, p);
                 }
