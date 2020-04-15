@@ -4,6 +4,25 @@ use std::io::Read;
 
 const N: usize = 9;
 
+struct Point {
+    x: usize,
+    y: usize
+}
+
+impl Copy for Point {}
+
+impl Clone for Point {
+    fn clone(&self) -> Point {
+        Point{x: self.x, y: self.y}
+    }
+}
+
+impl Point {
+    fn new() -> Point {
+        Point {x: 0, y: 0}
+    }
+}
+
 fn pendent_fila(f: [u8; N]) -> HashSet<u8> {
     let p: HashSet<u8> =  [1, 2, 3, 4, 5, 6, 7, 8, 9].iter().cloned().collect();    // Conjunt de possibilitats d'una cel.la
 
@@ -95,7 +114,8 @@ fn entrada(s: &mut [[u8; N]; N]) {
                 let digit: u32 = j.1.to_digit(10).unwrap();
                 //println!("Linea {}, Caracter {}, u32 {}, u8 {}", i.0, j.0, digit, (digit & 0xff) as u8);
                 s[i.0][j.0] = (digit & 0xff) as u8;     // u32 as 4 bytes, u8 as 1 byte (transform only last byte)
-            }        }    
+            }        
+        }    
     }
 }
 
@@ -119,6 +139,7 @@ fn imprimir(s: [[u8; N]; N]) {
     println!("+-------+-------+-------+");   
 }
 
+// Calcular les possibilitats de cada cel.la segons la seva fila, columna i submatriu
 fn pos(sudo: [[u8; N]; N], row: usize, col: usize) -> HashSet<u8> {
 
     let mut p: HashSet<u8> = HashSet::new();
@@ -137,8 +158,7 @@ fn pos(sudo: [[u8; N]; N], row: usize, col: usize) -> HashSet<u8> {
 fn restricc_fila(s: &mut [[u8; N]; N], row: usize) -> bool {     // Retorna 'true' si modifica el sudoku
     let mut modified = false;
 
-    let mut p_f: [HashSet<u8>; N] = [HashSet::new(), HashSet::new(), HashSet::new(),
-        HashSet::new(), HashSet::new(), HashSet::new(),HashSet::new(), HashSet::new(), HashSet::new()];
+    let mut p_f: [HashSet<u8>; N] = Default::default();
     
     // Calcular les possibilitats de cada cel.la d'aquesta fila
     for y in 0..N {
@@ -158,7 +178,6 @@ fn restricc_fila(s: &mut [[u8; N]; N], row: usize) -> bool {     // Retorna 'tru
             s[row][y] = number;
             modified = true;            
         }
-
     } 
 
     return modified;
@@ -167,8 +186,7 @@ fn restricc_fila(s: &mut [[u8; N]; N], row: usize) -> bool {     // Retorna 'tru
 fn restricc_col(s: &mut [[u8; N]; N], col: usize) -> bool {     // Retorna 'true' si modifica el sudoku
     let mut modified = false;
 
-    let mut p_c: [HashSet<u8>; N] = [HashSet::new(), HashSet::new(), HashSet::new(),
-        HashSet::new(), HashSet::new(), HashSet::new(),HashSet::new(), HashSet::new(), HashSet::new()];
+    let mut p_c: [HashSet<u8>; N] = Default::default();
     
     // Calcular les possibilitats de cada cel.la d'aquesta fila
     for x in 0..N {
@@ -188,7 +206,55 @@ fn restricc_col(s: &mut [[u8; N]; N], col: usize) -> bool {     // Retorna 'true
             s[x][col] = number;
             modified = true;            
         }
+    } 
 
+    return modified;
+}
+
+fn restricc_sub(s: &mut [[u8; N]; N], row:usize, col: usize) -> bool {     // Retorna 'true' si modifica el sudoku
+    let mut modified = false;
+
+    let mut p_s: [HashSet<u8>; N] = Default::default();
+    let mut coord: [Point; N] = [Point::new(); N];
+    
+    // Calcular les possibilitats de cada cel.la d'aquesta sub_matriu
+    let mut i = 6..9;
+
+    if row < 3 {
+        i = 0..3;
+    } else if row < 6 {
+        i = 3..6;
+    }
+
+    let mut k: usize = 0;
+    for x in i {
+        let mut j = 6..9;
+        if col < 3 {
+            j = 0..3;
+        } else if col < 6 {
+            j = 3..6;
+        }        
+        for y in j {      
+            p_s[k] = pos(*s, x, y);
+            coord[k].x = x;
+            coord[k].y = y;
+            k += 1;
+        } 
+    }    
+
+    // Check de cada cel.la la resta per veure si hi ha un nombre exclusiu 
+    for i in 0..9 {
+        let mut p: HashSet<u8> = p_s[i].iter().cloned().collect();
+        for j in 0..9 {
+            if (i != j) && !p.is_empty() {
+                p = p.difference(&p_s[j]).cloned().collect();
+            }    
+        }
+        if p.len() == 1 {
+            let number: u8 = p.drain().next().unwrap();
+            s[coord[i].x][coord[i].y] = number;
+            modified = true;            
+        }
     } 
 
     return modified;
@@ -202,7 +268,6 @@ fn main() {
     println!("Inici:");
     imprimir(sudoku);
 
-/*
     let mut fi = false;
     let mut complet = true;
     while !fi {
@@ -227,21 +292,46 @@ fn main() {
             fi = true;
         }
     }
-*/
+
+    let mut modif = false;
     for i in 0..9 {
         if restricc_fila(&mut sudoku, i) {
             println!("S'HA MODIFICAT, LINEA {}", i);
+            modif = true;
         }    
     }
+    if modif {
+        modif = false;
+        println!("LINEES:");
+        imprimir(sudoku);
+    }
+
     for i in 0..9 {
         if restricc_col(&mut sudoku, i) {
             println!("S'HA MODIFICAT, COLUMNA {}", i);
+            modif = true;
         }    
     }
+    if modif  {
+        //modif = false;
+        println!("COLUMNES:");
+        imprimir(sudoku);
+    }
+
+    for i in (0..9).step_by(3) {
+        for j in (0..9).step_by(3) {
+            if restricc_sub(&mut sudoku, i, j) {
+                println!("S'HA MODIFICAT, SUB {}, {}", i, j);
+            }
+        }
+    }
+
     println!("Final:");
     imprimir(sudoku);
-/*
+
+
     if !complet {       // Encara hi ha cel.les buides (amb 0)
+        // Hauriem de crear un arbol de cerca amb les diferents opcions que teneim ;)
         println!("Sudoku no finalitzat...");
         for i in 0..9 {
             for j in 0..9 {
@@ -252,5 +342,5 @@ fn main() {
             }
         }        
     }
-*/     
+     
 }
