@@ -329,7 +329,6 @@ fn main() {
     println!("Final:");
     imprimir(sudoku);
 
-
     if !complet {       // Encara hi ha cel.les buides (amb 0)
         // Hauriem de crear un arbol de cerca amb les diferents opcions que teneim ;)
         println!("Sudoku no finalitzat...");

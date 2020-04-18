@@ -17,9 +17,12 @@ int main() {
 	}
 	
 	for (i=0;i<n;i++) {
-		x = rand_u();
-		y = rand_u();
-		if (((x*x)-x+(y*y)-y) <= -1.0/4.0) {
+		x = rand_u();	// x ϵ (0,1)
+		y = rand_u();	// y ϵ (0,1)
+		// x²+y² <= 1 -> A_circle = πr² -> A_circle/4 ^ r=1 => π/4
+		// A_rect = 1*1 = 1
+		// Only calculate points in a quarter of circle -> Rectangle 1*1
+		if ((x*x)+(y*y) <= 1.00) {
 			p_dins_cercle++;
 		}
 	}

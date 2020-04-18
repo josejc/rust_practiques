@@ -14,14 +14,20 @@ fn main() {
 	// A_cercle = pi * r² -> pi * 1/4 => pi = A_cercle*4
 	// Dins rectangle x [0,1] i y [0,1] amb àrea A_rect = 1
 	// A_cercle/A_rect = pi/4 => pi = 4*A_cercle/A_rect
-        if ((x * x) - x + (y * y) -y) <= -1.0/4.0 {
-            in_circle += 1;
-        }
+        //if ((x * x) - x + (y * y) -y) <= -1.0/4.0 {
+        //    in_circle += 1;
+        //}
+	// Simplification x²+y²<=1 circle of center (0,0) amb r=1 -> A_circle = π 
+	// Only calculate points in a quarter of circle -> A_cicle = π/4
+	// A_rectangle = 1
+	if (x*x)+(y*y) <= 1.0 {
+		in_circle += 1;
+	}
     }
 
     // prints something close to 3.14159...
     println!(
-        "π is approximately {}",
+        "With N: {}, π is approximately {}", total,
         4. * (in_circle as f64) / (total as f64)
     );
 }
