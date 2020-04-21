@@ -23,6 +23,8 @@ impl Point {
     }
 }
 
+// Return the set of numbers possibles in this position by row
+// This numbers are the difference of 1..9 and the numbers already placed
 fn pendent_fila(f: [u8; N]) -> HashSet<u8> {
     let p: HashSet<u8> =  [1, 2, 3, 4, 5, 6, 7, 8, 9].iter().cloned().collect();    // Conjunt de possibilitats d'una cel.la
 
@@ -34,6 +36,8 @@ fn pendent_fila(f: [u8; N]) -> HashSet<u8> {
     return diff;
 }
 
+// Return the set of numbers possibles in this position by col
+// This numbers are the difference of 1..9 and the numbers already placed
 fn pendent_columna(s: [[u8; N]; N], col: usize) -> HashSet<u8> {
     let p: HashSet<u8> =  [1, 2, 3, 4, 5, 6, 7, 8, 9].iter().cloned().collect();    // Conjunt de possibilitats d'una cel.la
 
@@ -48,6 +52,8 @@ fn pendent_columna(s: [[u8; N]; N], col: usize) -> HashSet<u8> {
     return diff;    
 }
 
+// Return the set of numbers possibles in this position by submatrix
+// This numbers are the difference of 1..9 and the numbers already placed
 fn pendent_sub(s: [[u8; N]; N], row: usize, col: usize) -> HashSet<u8> {
     let p: HashSet<u8> =  [1, 2, 3, 4, 5, 6, 7, 8, 9].iter().cloned().collect();    // Conjunt de possibilitats d'una cel.la
 
@@ -78,6 +84,10 @@ fn pendent_sub(s: [[u8; N]; N], row: usize, col: usize) -> HashSet<u8> {
     return diff; 
 }
 
+
+// Read the sudoku of input in 2 forms
+// 1. Matrix 9x9, only numbers and 0 is unknow
+// 2. All in row, '.' is unkow
 fn entrada(s: &mut [[u8; N]; N]) {
     let mut entrada = String::new();
 
@@ -119,6 +129,7 @@ fn entrada(s: &mut [[u8; N]; N]) {
     }
 }
 
+// Prints sudoku in pretty presentation
 fn imprimir(s: [[u8; N]; N]) {
     for (i, row) in s.iter().enumerate() {
         if (i % 3) == 0 {
@@ -139,7 +150,8 @@ fn imprimir(s: [[u8; N]; N]) {
     println!("+-------+-------+-------+");   
 }
 
-// Calcular les possibilitats de cada cel.la segons la seva fila, columna i submatriu
+// Return Hashset and all the numbers possibles in this position (col,row) 
+// Is the intersection of the sets row, col and submatrix
 fn pos(sudo: [[u8; N]; N], row: usize, col: usize) -> HashSet<u8> {
 
     let mut p: HashSet<u8> = HashSet::new();
@@ -155,7 +167,9 @@ fn pos(sudo: [[u8; N]; N], row: usize, col: usize) -> HashSet<u8> {
     return p;
 } 
 
-fn restricc_fila(s: &mut [[u8; N]; N], row: usize) -> bool {     // Retorna 'true' si modifica el sudoku
+// Calculate constraints of row, specified in row
+// Return -> true if modified sudoku
+fn restricc_fila(s: &mut [[u8; N]; N], row: usize) -> bool {
     let mut modified = false;
 
     let mut p_f: [HashSet<u8>; N] = Default::default();
@@ -183,7 +197,9 @@ fn restricc_fila(s: &mut [[u8; N]; N], row: usize) -> bool {     // Retorna 'tru
     return modified;
 }
 
-fn restricc_col(s: &mut [[u8; N]; N], col: usize) -> bool {     // Retorna 'true' si modifica el sudoku
+// Calculate constraints of col, specified in col
+// Return -> true if modified sudoku
+fn restricc_col(s: &mut [[u8; N]; N], col: usize) -> bool {
     let mut modified = false;
 
     let mut p_c: [HashSet<u8>; N] = Default::default();
@@ -211,7 +227,9 @@ fn restricc_col(s: &mut [[u8; N]; N], col: usize) -> bool {     // Retorna 'true
     return modified;
 }
 
-fn restricc_sub(s: &mut [[u8; N]; N], row:usize, col: usize) -> bool {     // Retorna 'true' si modifica el sudoku
+// Calculate constraints of submatrix 3x3, of postion by coord (row,col)
+// Return -> true if modified sudoku
+fn restricc_sub(s: &mut [[u8; N]; N], row:usize, col: usize) -> bool {
     let mut modified = false;
 
     let mut p_s: [HashSet<u8>; N] = Default::default();
@@ -260,27 +278,23 @@ fn restricc_sub(s: &mut [[u8; N]; N], row:usize, col: usize) -> bool {     // Re
     return modified;
 }
 
-fn main() {
-    
-    let mut sudoku = [[0 as u8; N] ; N];
-    entrada(&mut sudoku);
-
-    println!("Inici:");
-    imprimir(sudoku);
-
+// Propagate all constraints in the sudoku
+// Return true if sudoku is resolved
+fn propagate_constraints(s: &mut [[u8; N]; N]) -> bool {
     let mut fi = false;
     let mut complet = true;
+
     while !fi {
         complet = true;
         let mut canvi = false;
         for i in 0..9 {
             for j in 0..9 {
-                if sudoku[i][j] == 0 {
-                    let mut p = pos(sudoku, i , j);
+                if s[i][j] == 0 {
+                    let mut p = pos(*s, i , j);
                     if p.len() == 1 {
                         let number: u8 = p.drain().next().unwrap();
                         //println!("OK {}", number);
-                        sudoku[i][j] = number;
+                        s[i][j] = number;
                         canvi = true;
                     } else {
                         complet = false;    // Encara no complet pq no hem pogut assignar res a aquesta cel.la
@@ -295,7 +309,7 @@ fn main() {
 
     let mut modif = false;
     for i in 0..9 {
-        if restricc_fila(&mut sudoku, i) {
+        if restricc_fila(s, i) {
             println!("S'HA MODIFICAT, LINEA {}", i);
             modif = true;
         }    
@@ -303,11 +317,11 @@ fn main() {
     if modif {
         modif = false;
         println!("LINEES:");
-        imprimir(sudoku);
+        imprimir(*s);
     }
 
     for i in 0..9 {
-        if restricc_col(&mut sudoku, i) {
+        if restricc_col(s, i) {
             println!("S'HA MODIFICAT, COLUMNA {}", i);
             modif = true;
         }    
@@ -315,16 +329,29 @@ fn main() {
     if modif  {
         //modif = false;
         println!("COLUMNES:");
-        imprimir(sudoku);
+        imprimir(*s);
     }
 
     for i in (0..9).step_by(3) {
         for j in (0..9).step_by(3) {
-            if restricc_sub(&mut sudoku, i, j) {
+            if restricc_sub(s, i, j) {
                 println!("S'HA MODIFICAT, SUB {}, {}", i, j);
             }
         }
     }
+
+    return complet;
+}
+
+fn main() {
+    
+    let mut sudoku = [[0 as u8; N] ; N];
+    entrada(&mut sudoku);
+
+    println!("Inici:");
+    imprimir(sudoku);
+
+    let complet = propagate_constraints(&mut sudoku);
 
     println!("Final:");
     imprimir(sudoku);
