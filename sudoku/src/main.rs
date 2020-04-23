@@ -23,8 +23,8 @@ impl Point {
     }
 }
 
-// Return the set of numbers possibles in this position by row
-// This numbers are the difference of 1..9 and the numbers already placed
+/// Return the set of numbers possibles in this position by row
+/// This numbers are the difference of 1..9 and the numbers already placed
 fn pendent_fila(f: [u8; N]) -> HashSet<u8> {
     let p: HashSet<u8> =  [1, 2, 3, 4, 5, 6, 7, 8, 9].iter().cloned().collect();    // Conjunt de possibilitats d'una cel.la
 
@@ -33,11 +33,11 @@ fn pendent_fila(f: [u8; N]) -> HashSet<u8> {
     let diff: HashSet<u8> = p.difference(&f_set).cloned().collect();
     //println!("pendents: {:?}", diff);
 
-    return diff;
+    diff
 }
 
-// Return the set of numbers possibles in this position by col
-// This numbers are the difference of 1..9 and the numbers already placed
+/// Return the set of numbers possibles in this position by col
+/// This numbers are the difference of 1..9 and the numbers already placed
 fn pendent_columna(s: [[u8; N]; N], col: usize) -> HashSet<u8> {
     let p: HashSet<u8> =  [1, 2, 3, 4, 5, 6, 7, 8, 9].iter().cloned().collect();    // Conjunt de possibilitats d'una cel.la
 
@@ -49,11 +49,11 @@ fn pendent_columna(s: [[u8; N]; N], col: usize) -> HashSet<u8> {
     let diff: HashSet<u8> = p.difference(&c_set).cloned().collect();
     //println!("pendents: {:?}", diff);
 
-    return diff;    
+    diff    
 }
 
-// Return the set of numbers possibles in this position by submatrix
-// This numbers are the difference of 1..9 and the numbers already placed
+/// Return the set of numbers possibles in this position by submatrix
+/// This numbers are the difference of 1..9 and the numbers already placed
 fn pendent_sub(s: [[u8; N]; N], row: usize, col: usize) -> HashSet<u8> {
     let p: HashSet<u8> =  [1, 2, 3, 4, 5, 6, 7, 8, 9].iter().cloned().collect();    // Conjunt de possibilitats d'una cel.la
 
@@ -81,13 +81,13 @@ fn pendent_sub(s: [[u8; N]; N], row: usize, col: usize) -> HashSet<u8> {
     let diff: HashSet<u8> = p.difference(&s_set).cloned().collect();
     //println!("pendents: {:?}", diff);
 
-    return diff; 
+    diff 
 }
 
 
-// Read the sudoku of input in 2 forms
-// 1. Matrix 9x9, only numbers and 0 is unknow
-// 2. All in row, '.' is unkow
+/// Read the sudoku of input in 2 forms
+/// 1. Matrix 9x9, only numbers and 0 is unknow
+/// 2. All in row, '.' is unkow
 fn entrada(s: &mut [[u8; N]; N]) {
     let mut entrada = String::new();
 
@@ -129,7 +129,7 @@ fn entrada(s: &mut [[u8; N]; N]) {
     }
 }
 
-// Prints sudoku in pretty presentation
+/// Prints sudoku in pretty presentation
 fn imprimir(s: [[u8; N]; N]) {
     for (i, row) in s.iter().enumerate() {
         if (i % 3) == 0 {
@@ -150,8 +150,8 @@ fn imprimir(s: [[u8; N]; N]) {
     println!("+-------+-------+-------+");   
 }
 
-// Return Hashset and all the numbers possibles in this position (col,row) 
-// Is the intersection of the sets row, col and submatrix
+/// Return Hashset and all the numbers possibles in this position (col,row) 
+/// Is the intersection of the sets row, col and submatrix
 fn pos(sudo: [[u8; N]; N], row: usize, col: usize) -> HashSet<u8> {
 
     let mut p: HashSet<u8> = HashSet::new();
@@ -164,11 +164,11 @@ fn pos(sudo: [[u8; N]; N], row: usize, col: usize) -> HashSet<u8> {
         p = m.intersection(&s).cloned().collect();
     }
 
-    return p;
+    p
 } 
 
-// Calculate constraints of row, specified in row
-// Return -> true if modified sudoku
+/// Calculate constraints of row, specified in row
+/// Return -> true if modified sudoku
 fn restricc_fila(s: &mut [[u8; N]; N], row: usize) -> bool {
     let mut modified = false;
 
@@ -194,11 +194,11 @@ fn restricc_fila(s: &mut [[u8; N]; N], row: usize) -> bool {
         }
     } 
 
-    return modified;
+    modified
 }
 
-// Calculate constraints of col, specified in col
-// Return -> true if modified sudoku
+/// Calculate constraints of col, specified in col
+/// Return -> true if modified sudoku
 fn restricc_col(s: &mut [[u8; N]; N], col: usize) -> bool {
     let mut modified = false;
 
@@ -224,11 +224,11 @@ fn restricc_col(s: &mut [[u8; N]; N], col: usize) -> bool {
         }
     } 
 
-    return modified;
+    modified
 }
 
-// Calculate constraints of submatrix 3x3, of postion by coord (row,col)
-// Return -> true if modified sudoku
+/// Calculate constraints of submatrix 3x3, of postion by coord (row,col)
+/// Return -> true if modified sudoku
 fn restricc_sub(s: &mut [[u8; N]; N], row:usize, col: usize) -> bool {
     let mut modified = false;
 
@@ -275,17 +275,16 @@ fn restricc_sub(s: &mut [[u8; N]; N], row:usize, col: usize) -> bool {
         }
     } 
 
-    return modified;
+    modified
 }
 
-// Propagate all constraints in the sudoku
-// Return true if sudoku is resolved
+/// Propagate all constraints in the sudoku
+/// Return true if sudoku is resolved
 fn propagate_constraints(s: &mut [[u8; N]; N]) -> bool {
     let mut fi = false;
     let mut complet = true;
 
     while !fi {
-        complet = true;
         let mut canvi = false;
         for i in 0..9 {
             for j in 0..9 {
@@ -296,9 +295,7 @@ fn propagate_constraints(s: &mut [[u8; N]; N]) -> bool {
                         //println!("OK {}", number);
                         s[i][j] = number;
                         canvi = true;
-                    } else {
-                        complet = false;    // Encara no complet pq no hem pogut assignar res a aquesta cel.la
-                    }
+                    } 
                 }
             }
         }
@@ -340,7 +337,15 @@ fn propagate_constraints(s: &mut [[u8; N]; N]) -> bool {
         }
     }
 
-    return complet;
+    for i in (0..9).step_by(3) {
+        for j in (0..9).step_by(3) {
+            if s[i][j] == 0 {
+                complet = false;
+            }
+        }
+    }    
+
+    complet
 }
 
 fn main() {
