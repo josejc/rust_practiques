@@ -21,6 +21,11 @@ impl Point {
     fn new() -> Point {
         Point {x: 0, y: 0}
     }
+
+    fn set(&mut self, i: usize, j: usize) {
+        self.x = i;
+        self.y = j;
+    }
 }
 
 /// Return the set of numbers possibles in this position by row
@@ -348,6 +353,60 @@ fn propagate_constraints(s: &mut [[u8; N]; N]) -> bool {
     complet
 }
 
+fn pendents(s: [[u8; N]; N]) -> (Point, HashSet<u8>) {
+
+    let mut minim: Point = Point { x: 9, y: 9 };
+    let mut pminim: HashSet<u8> = HashSet::new();
+    for i in 0..9 {
+        for j in 0..9 {
+            if s[i][j] == 0 {
+                let p = pos(s, i, j);
+                println!("Possibilitats posició {}, {}: {:?}", i, j, p);
+                if minim.x == 9 && minim.y == 9 {
+                    minim.set(i, j);
+                    pminim = p;
+                } else {
+                    if p.len() < pminim.len() {
+                        minim.set(i, j);
+                        pminim = p;
+                    }
+                }    
+            }
+        }
+    }
+
+    (minim, pminim)
+}
+
+
+fn backup(s: [[u8; N]; N]) -> [[u8; N]; N] {
+    let mut backup: [[u8; N]; N] = [[0 as u8; N] ; N];
+
+    for i in 0..9 {
+        for j in 0..9 {
+            backup[i][j] = s[i][j];
+        }
+    }
+    backup
+}
+
+fn explora(s: &mut [[u8; N]; N]) {
+    let bkp = backup(*s);
+    let (c, p) = pendents(*s);
+
+    for i in p.iter() {
+        *s = backup(bkp);
+        s[c.x][c.y] = *i;
+        let complet = propagate_constraints(s);
+        if complet {
+            println!("Final:");
+            imprimir(*s); 
+        } else {
+            explora(s);
+        }
+    }
+}
+
 fn main() {
     
     let mut sudoku = [[0 as u8; N] ; N];
@@ -356,22 +415,8 @@ fn main() {
     println!("Inici:");
     imprimir(sudoku);
 
-    let complet = propagate_constraints(&mut sudoku);
+    let _complet = propagate_constraints(&mut sudoku);
 
-    println!("Final:");
-    imprimir(sudoku);
+    explora(&mut sudoku);    
 
-    if !complet {       // Encara hi ha cel.les buides (amb 0)
-        // Hauriem de crear un arbol de cerca amb les diferents opcions que teneim ;)
-        println!("Sudoku no finalitzat...");
-        for i in 0..9 {
-            for j in 0..9 {
-                if sudoku[i][j] == 0 {
-                    let p = pos(sudoku, i, j);
-                    println!("Possibilitats posició {}, {}: {:?}", i, j, p);
-                }
-            }
-        }        
-    }
-     
 }
