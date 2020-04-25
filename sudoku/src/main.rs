@@ -309,41 +309,41 @@ fn propagate_constraints(s: &mut [[u8; N]; N]) -> bool {
         }
     }
 
-    let mut modif = false;
+    //let mut modif = false;
     for i in 0..9 {
         if restricc_fila(s, i) {
-            println!("S'HA MODIFICAT, LINEA {}", i);
-            modif = true;
+            //println!("S'HA MODIFICAT, LINEA {}", i);
+            //modif = true;
         }    
     }
-    if modif {
-        modif = false;
-        println!("LINEES:");
-        imprimir(*s);
-    }
+    //if modif {
+    //    modif = false;
+    //    println!("LINEES:");
+    //    imprimir(*s);
+    //}
 
     for i in 0..9 {
         if restricc_col(s, i) {
-            println!("S'HA MODIFICAT, COLUMNA {}", i);
-            modif = true;
+            //println!("S'HA MODIFICAT, COLUMNA {}", i);
+            //modif = true;
         }    
     }
-    if modif  {
+    //if modif  {
         //modif = false;
-        println!("COLUMNES:");
-        imprimir(*s);
-    }
+    //    println!("COLUMNES:");
+    //    imprimir(*s);
+    //}
 
     for i in (0..9).step_by(3) {
         for j in (0..9).step_by(3) {
             if restricc_sub(s, i, j) {
-                println!("S'HA MODIFICAT, SUB {}, {}", i, j);
+                //println!("S'HA MODIFICAT, SUB {}, {}", i, j);
             }
         }
     }
 
-    for i in (0..9).step_by(3) {
-        for j in (0..9).step_by(3) {
+    for i in 0..9 {
+        for j in 0..9 {
             if s[i][j] == 0 {
                 complet = false;
             }
@@ -361,7 +361,7 @@ fn pendents(s: [[u8; N]; N]) -> (Point, HashSet<u8>) {
         for j in 0..9 {
             if s[i][j] == 0 {
                 let p = pos(s, i, j);
-                println!("Possibilitats posició {}, {}: {:?}", i, j, p);
+                //println!("Possibilitats posició {}, {}: {:?}", i, j, p);
                 if minim.x == 9 && minim.y == 9 {
                     minim.set(i, j);
                     pminim = p;
@@ -399,7 +399,7 @@ fn explora(s: &mut [[u8; N]; N]) {
         s[c.x][c.y] = *i;
         let complet = propagate_constraints(s);
         if complet {
-            println!("Final:");
+            println!("Trobat:");
             imprimir(*s); 
         } else {
             explora(s);
@@ -415,8 +415,15 @@ fn main() {
     println!("Inici:");
     imprimir(sudoku);
 
-    let _complet = propagate_constraints(&mut sudoku);
+    let complet = propagate_constraints(&mut sudoku);
 
-    explora(&mut sudoku);    
+    if !complet {
+        explora(&mut sudoku);
+    } else {
+        println!("Final:");
+        imprimir(sudoku); 
+    }
+
+     
 
 }
