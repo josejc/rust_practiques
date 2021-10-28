@@ -1,0 +1,10 @@
+https://tdop.github.io/										; The Pratt paper in html format
+
+https://journal.stuffwithstuff.com/2011/03/19/pratt-parsers-expression-parsing-made-easy/	; Implemented in Java
+	;  the vulgar Latin of programming languages. I figure if you can write it in Java, you can write it in anything
+
+https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html			; Explain in Rust
+https://matklad.github.io/2020/04/15/from-pratt-to-dijkstra.html				; Explain the Dijkstra version -> without recursivity, use a stack
+
+https://github.com/ZerothLaw/prattle-rs								; Another implementation in Rust 
+
