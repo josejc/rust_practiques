@@ -1,3 +1,5 @@
+#![warn(clippy::all, clippy::pedantic)]
+
 fn main() {
     //let MYLIST = ["One", "Two", "Three"];
     let my_list = ["One", "Two", "Three"];
