@@ -1,6 +1,7 @@
 #![warn(clippy::all, clippy::pedantic)]
 
 //binary_search pag.9 - grokking algorithms
+//Only work in a ordered array ;-)
 fn binary_search (list: [i32; 5], item:i32) -> i32 {
     let mut low = 0;
     let mut high = list.len()-1;
