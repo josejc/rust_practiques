@@ -25,7 +25,7 @@ fn binary_search (list: &Vec<i32>, item:i32) -> i32 {
 }
 
 // binary_search_recursive, Exercise 4.3
-fn bsr (list: &Vec<i32>, item: i32) -> i32 {
+fn bsr (list: &Vec<i32>, item: i32, size: i32) -> i32 {
     let mid = list.len() / 2;
     //println!("{:?}", list);
     //println!("len:{}", list.len());
@@ -34,17 +34,16 @@ fn bsr (list: &Vec<i32>, item: i32) -> i32 {
         return -1;
     }
     if list[mid] == item {
-        return mid as i32;
+        return size+mid as i32;
     }
     if list[mid] > item {
-        return bsr(&list[0..mid].to_vec(), item);
+        return bsr(&list[0..mid].to_vec(), item, size);
     } else {
-        // TODO lost the lengh of the original vector
-        // The index solution is in the new vector...
-        // Fix... 
+        // Lost the lengh of the original vector, add size for final solution
         let n = list.len();
         if (mid + 1) <= n {
-            return bsr(&list[mid+1..n].to_vec(), item);
+            let s = mid as i32 + 1;
+            return bsr(&list[mid+1..n].to_vec(), item, s);
         } 
     }
     -1
@@ -62,12 +61,12 @@ fn main() {
     println!("Binary search 6 at index: {}", binary_search(&my_list, 6));
     println!("Binary search 26 at index: {}", binary_search(&my_list, 26));
     println!("Binary search -3 at index: {}", binary_search(&my_list, -3));
-    println!("Binary search recursive 1 at index: {}", bsr(&my_list, 1));
-    println!("Binary search recursive 3 at index: {}", bsr(&my_list, 3));
-    println!("Binary search recursive 5 at index: {}", bsr(&my_list, 5));
-    println!("Binary search recursive 7 at index: {}", bsr(&my_list, 7));
-    println!("Binary search recursive 9 at index: {}", bsr(&my_list, 9));
-    println!("Binary search recursive 6 at index: {}", bsr(&my_list, 6));
-    println!("Binary search recursive 26 at index: {}", bsr(&my_list, 26));
-    println!("Binary search recursive -3 at index: {}", bsr(&my_list, -3));
+    println!("Binary search recursive 1 at index: {}", bsr(&my_list, 1, 0));
+    println!("Binary search recursive 3 at index: {}", bsr(&my_list, 3, 0));
+    println!("Binary search recursive 5 at index: {}", bsr(&my_list, 5, 0));
+    println!("Binary search recursive 7 at index: {}", bsr(&my_list, 7, 0));
+    println!("Binary search recursive 9 at index: {}", bsr(&my_list, 9, 0));
+    println!("Binary search recursive 6 at index: {}", bsr(&my_list, 6, 0));
+    println!("Binary search recursive 26 at index: {}", bsr(&my_list, 26, 0));
+    println!("Binary search recursive -3 at index: {}", bsr(&my_list, -3, 0));
 }
