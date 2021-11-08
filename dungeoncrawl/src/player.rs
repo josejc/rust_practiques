@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 pub struct Player {
-    pub position: Point
+    pub position: Point,
 }
 
 impl Player {
@@ -26,7 +26,7 @@ impl Player {
                 VirtualKeyCode::Right => Point::new(1, 0),
                 VirtualKeyCode::Up => Point::new(0, -1),
                 VirtualKeyCode::Down => Point::new(0, 1),
-                _ => Point::zero()
+                _ => Point::zero(),
             };
             let new_position = self.position + delta;
             if map.can_enter_tile(new_position) {
