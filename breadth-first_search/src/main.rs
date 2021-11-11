@@ -7,6 +7,70 @@ mod prelude {
 
 use prelude::*;
 
+#[derive(Debug)]
+struct Data {
+    friends: Vec<String>,
+    mango_seller: bool,
+}
+
+fn build_data(friends: Vec<String>, mango_seller: bool) -> Data {
+    Data {
+        friends,
+        mango_seller,
+    }
+}
+
+fn inserts_friends() -> std::collections::HashMap<String, Data> {
+    // Type inference lets us omit an explicit type signature (which
+    // would be `HashMap<String, Vec<&str>>` in this example).
+    let mut relations = HashMap::new();
+
+    // Insert friends in HashMap
+    let data_person = build_data(vec!["alice".to_string(), "bob".to_string(), "claire".to_string()], false);
+    relations.insert(
+        "you".to_string(),
+        data_person
+    );
+
+    let data_person = build_data(vec!["anuj".to_string(), "peggy".to_string()], false);
+    relations.insert(
+        "bob".to_string(),
+        data_person
+    );
+    let data_person = build_data(vec!["thom".to_string(), "jonny".to_string()], false);
+    relations.insert(
+        "claire".to_string(),
+        data_person
+    );
+    let data_person = build_data(vec!["peggy".to_string()], false);
+    relations.insert(
+        "alice".to_string(),
+        data_person
+    );
+    let data_person = build_data(vec![], false);
+    relations.insert(
+        "anuj".to_string(),
+        data_person
+    );
+    let data_person = build_data(vec![], false);
+    relations.insert(
+        "peggy".to_string(),
+        data_person
+    );
+    let data_person = build_data(vec![], true);
+    relations.insert(
+        "thom".to_string(),
+        data_person
+    );
+    let data_person = build_data(vec![], false);
+    relations.insert(
+        "jonny".to_string(),
+        data_person
+    );
+
+    relations
+}
+
 fn main() {
     let mut queue: Queue<String> = Queue::new();
     queue.add("bob".to_string());
@@ -14,46 +78,10 @@ fn main() {
     assert_eq!(item, "bob".to_string());
     assert_eq!(queue.is_empty(), true);
 
-    // Type inference lets us omit an explicit type signature (which
-    // would be `HashMap<String, Vec<String>>` in this example).
-    let mut relations = HashMap::new();
-
-    // Insert friends in HashMap
-    relations.insert(
-        "you".to_string(),
-        vec!["alice", "bob", "claire"],
-    );
-    relations.insert(
-        "bob".to_string(),
-        vec!["anuj", "peggy"],
-    );
-    relations.insert(
-        "claire".to_string(),
-        vec!["thom", "jonny"],
-    );
-    relations.insert(
-        "alice".to_string(),
-        vec!["peggy"],
-    );
-    relations.insert(
-        "anuj".to_string(),
-        vec![],
-    );
-    relations.insert(
-        "peggy".to_string(),
-        vec![],
-    );
-    relations.insert(
-        "thom".to_string(),
-        vec![],
-    );
-    relations.insert(
-        "jonny".to_string(),
-        vec![],
-    );
+    let mut relations = inserts_friends();
     
     // Iterate over everything.
-    for (person, friends) in &relations {
-        println!("{}: \"{:?}\"", person, friends);
+    for (person, data) in &relations {
+        println!("{}: \"{:?}\"", person, data);
     }
 }
