@@ -1,4 +1,5 @@
 #[derive(Debug)]
+#[derive(Clone)]
 pub struct Queue<T> {
     queue: Vec<T>,
 }
@@ -8,10 +9,6 @@ impl<T> Queue<T> {
         Queue { queue: Vec::new() }
     }
 
-    pub fn len(&self) -> usize {
-        self.queue.len()
-    }
-
     pub fn add(&mut self, item: T) {
         self.queue.push(item)
     }
@@ -19,11 +16,11 @@ impl<T> Queue<T> {
     pub fn out(&mut self) -> T {
         self.queue.remove(0)
     }
-    pub fn is_empty(&self) -> bool {
+    pub fn empty(&self) -> bool {
         self.queue.is_empty()
     }
 
-    pub fn peek(&self) -> Option<&T> {
-        self.queue.first()
-    }
+    //pub fn peek(&self) -> Option<&T> {
+    //    self.queue.first()
+    //}
 }
