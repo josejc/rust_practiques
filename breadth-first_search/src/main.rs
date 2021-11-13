@@ -6,6 +6,7 @@ mod prelude {
 }
 
 use prelude::*;
+use std::process;
 
 #[derive(Debug)]
 struct Data {
@@ -22,7 +23,7 @@ fn build_data(friends: Vec<String>, mango_seller: bool) -> Data {
 
 fn inserts_friends() -> std::collections::HashMap<String, Data> {
     // Type inference lets us omit an explicit type signature (which
-    // would be `HashMap<String, Vec<&str>>` in this example).
+    // would be `HashMap<String, Vec<String>>` in this example).
     let mut relations = HashMap::new();
 
     // Insert friends in HashMap
@@ -73,15 +74,29 @@ fn inserts_friends() -> std::collections::HashMap<String, Data> {
 
 fn main() {
     let mut queue: Queue<String> = Queue::new();
-    queue.add("bob".to_string());
-    let item = queue.out();
-    assert_eq!(item, "bob".to_string());
-    assert_eq!(queue.is_empty(), true);
-
-    let mut relations = inserts_friends();
+    let relations = inserts_friends();
     
-    // Iterate over everything.
-    for (person, data) in &relations {
-        println!("{}: \"{:?}\"", person, data);
+    let value = relations.get(&"you".to_string()); 
+    if let Some(v) = value {
+        for val in &v.friends {
+            queue.add(val.to_string());
+        }
+    }    
+
+    while queue.len() != 0 {
+        let person = queue.out();
+
+        let data = relations.get(&person);
+        if let Some(d) = data {
+            if d.mango_seller {
+                println!("I find a mango seller");
+                process::exit(1);
+            } else {
+                for val in &d.friends {
+                    queue.add(val.to_string());
+                }
+            }
+        }
     }
+    println!("I don't find a mango seller");
 }
