@@ -107,5 +107,33 @@ fn main() {
     }
     println!("---Costs: {:?}", costs);
     println!("---Parents: {:?}", parents);
-    println!("---Node low cost: {}", find_lowest_cost_node(&costs, &procesed));
+
+    // The solution, returning from the end node
+    // Use Vec like a Stack
+    let mut sol_node: Vec<String> = vec![];
+    let mut sol_weight: Vec<isize> = vec![];
+    
+    node = "F".to_string();
+    sol_node.push(node.clone());
+    while node != "S" {
+        if let Some (c) = costs.get(&node.to_string()) {
+            sol_weight.push(*c);
+        }
+        if let Some(p) = parents.get(&node.to_string()) {
+            node = p.to_string();
+            sol_node.push(node.clone());
+        }
+    }
+    // Now print the Solution ;-)
+    println!("The path from the initial node with the accumulated weight"); 
+    while node != "F"{
+        if let Some(n) = sol_node.pop() {
+            node = n.to_string();
+            print!("{}", node);
+        }
+        if let Some(c) = sol_weight.pop() {
+            print!("---({})--->", c);
+        }
+    }
+    println!("");
 }
