@@ -124,6 +124,7 @@ fn main() {
             sol_node.push(node.clone());
         }
     }
+    let sol_node_aux = sol_node.clone();
     // Now print the Solution ;-)
     println!("The path from the initial node with the accumulated weight"); 
     while node != "F"{
@@ -136,4 +137,25 @@ fn main() {
         }
     }
     println!("");
+    
+    sol_node = sol_node_aux;
+    println!("The path from the initial node with the weight per node"); 
+    let mut node_parent: String;
+    if let Some(n) = sol_node.pop() {
+        node = n.to_string();
+    }
+    while node != "F"{
+        if let Some(n) = sol_node.pop() {
+            node_parent = node;
+            node = n.to_string();
+            print!("{}", node_parent);
+            if let Some(n) = g.get(&node_parent) {
+                if let Some(c) = n.get(&node) {
+                    print!("---({})--->", c);
+                }
+            }
+        }
+    }
+    println!("{}", node);
+    
 }
