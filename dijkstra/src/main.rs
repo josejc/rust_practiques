@@ -4,31 +4,87 @@ mod prelude {
 
 use prelude::*;
 
-fn new_graph() -> std::collections::HashMap<String, HashMap<String, isize>> {
+fn new_graph(opt: &str) -> std::collections::HashMap<String, HashMap<String, isize>> {
     let mut graph: HashMap<String, HashMap<String, isize>> = HashMap::new();
 
     // Insert Nodes and his weigh
     let mut neighbors: HashMap<String, isize> = HashMap::new();
-    neighbors.insert("A".to_string(), 6);
-    neighbors.insert("B".to_string(), 2);
-    graph.insert("S".to_string(), neighbors);
+    match opt {
+        "A" => {
+            neighbors.insert("A".to_string(), 5);
+            neighbors.insert("B".to_string(), 2);
+            graph.insert("S".to_string(), neighbors);
 
-    let mut neighbors = HashMap::new();
-    neighbors.insert("F".to_string(), 1);
-    graph.insert("A".to_string(), neighbors);
+            let mut neighbors = HashMap::new();
+            neighbors.insert("C".to_string(), 4);
+            neighbors.insert("D".to_string(), 2);
+            graph.insert("A".to_string(), neighbors);
 
-    let mut neighbors = HashMap::new();
-    neighbors.insert("A".to_string(), 3);
-    neighbors.insert("F".to_string(), 5);
-    graph.insert("B".to_string(), neighbors);
+            let mut neighbors = HashMap::new();
+            neighbors.insert("A".to_string(), 8);
+            neighbors.insert("D".to_string(), 7);
+            graph.insert("B".to_string(), neighbors);
 
-    let neighbors = HashMap::new();
-    graph.insert("F".to_string(), neighbors);
+            let mut neighbors = HashMap::new();
+            neighbors.insert("F".to_string(), 3);
+            neighbors.insert("D".to_string(), 6);
+            graph.insert("C".to_string(), neighbors);
 
-    graph 
+            let mut neighbors = HashMap::new();
+            neighbors.insert("F".to_string(), 1);
+            graph.insert("D".to_string(), neighbors);
+
+            let neighbors = HashMap::new();
+            graph.insert("F".to_string(), neighbors);
+        }
+        "B" => {
+            neighbors.insert("A".to_string(), 10);
+            graph.insert("S".to_string(), neighbors);
+
+            let mut neighbors = HashMap::new();
+            neighbors.insert("C".to_string(), 20);
+            graph.insert("A".to_string(), neighbors);
+
+            let mut neighbors = HashMap::new();
+            neighbors.insert("A".to_string(), 1);
+            graph.insert("B".to_string(), neighbors);
+
+            let mut neighbors = HashMap::new();
+            neighbors.insert("F".to_string(), 30);
+            neighbors.insert("B".to_string(), 1);
+            graph.insert("C".to_string(), neighbors);
+
+            let neighbors = HashMap::new();
+            graph.insert("F".to_string(), neighbors);
+        }
+        "C" => {
+            // Example with weigth negative :-(
+        }
+        _ => {
+            neighbors.insert("A".to_string(), 6);
+            neighbors.insert("B".to_string(), 2);
+            graph.insert("S".to_string(), neighbors);
+
+            let mut neighbors = HashMap::new();
+            neighbors.insert("F".to_string(), 1);
+            graph.insert("A".to_string(), neighbors);
+
+            let mut neighbors = HashMap::new();
+            neighbors.insert("A".to_string(), 3);
+            neighbors.insert("F".to_string(), 5);
+            graph.insert("B".to_string(), neighbors);
+
+            let neighbors = HashMap::new();
+            graph.insert("F".to_string(), neighbors);
+        }
+    }
+
+    graph
 }
 
-fn ini_dijkstra(graph: &HashMap<String, HashMap<String, isize>>) -> (HashMap<String, isize>, HashMap<String, String>) {
+fn ini_dijkstra(
+    graph: &HashMap<String, HashMap<String, isize>>,
+) -> (HashMap<String, isize>, HashMap<String, String>) {
     let mut costs: HashMap<String, isize> = HashMap::new();
     let mut parents: HashMap<String, String> = HashMap::new();
 
@@ -71,7 +127,7 @@ fn find_lowest_cost_node(costs: &HashMap<String, isize>, procesed: &Vec<String>)
 
 //p.134 Grokking algoritms
 fn main() {
-    let g = new_graph();
+    let g = new_graph("A");
     let tuple: (HashMap<String, isize>, HashMap<String, String>) = ini_dijkstra(&g);
     let mut costs: HashMap<String, isize> = tuple.0;
     let mut parents: HashMap<String, String> = tuple.1;
@@ -82,7 +138,10 @@ fn main() {
     println!("Graph: {:?}", g);
     println!("Costs: {:?}", costs);
     println!("Parents: {:?}", parents);
-    println!("Node low cost: {}", find_lowest_cost_node(&costs, &procesed));
+    println!(
+        "Node low cost: {}",
+        find_lowest_cost_node(&costs, &procesed)
+    );
 
     let mut node: String = find_lowest_cost_node(&costs, &procesed);
     while !node.is_empty() {
@@ -98,6 +157,11 @@ fn main() {
                             costs.insert(n.0.to_string(), new_cost);
                             parents.insert(n.0.to_string(), node.to_string());
                         }
+                    } else {
+                        // If this node was not yet achievable, then we need add to costs and
+                        // parents
+                        costs.insert(n.0.to_string(), new_cost);
+                        parents.insert(n.0.to_string(), node.to_string());
                     }
                 }
                 procesed.push(node);
@@ -108,54 +172,59 @@ fn main() {
     println!("---Costs: {:?}", costs);
     println!("---Parents: {:?}", parents);
 
-    // The solution, returning from the end node
-    // Use Vec like a Stack
-    let mut sol_node: Vec<String> = vec![];
-    let mut sol_weight: Vec<isize> = vec![];
-    
-    node = "F".to_string();
-    sol_node.push(node.clone());
-    while node != "S" {
-        if let Some (c) = costs.get(&node.to_string()) {
-            sol_weight.push(*c);
-        }
-        if let Some(p) = parents.get(&node.to_string()) {
-            node = p.to_string();
+    if let Some(c) = costs.get("F") {
+        if *c == isize::MAX {
+            println!("I don't find solution");
+        } else {
+            // The solution, returning from the end node
+            // Use Vec like a Stack
+            let mut sol_node: Vec<String> = vec![];
+            let mut sol_weight: Vec<isize> = vec![];
+
+            node = "F".to_string();
             sol_node.push(node.clone());
-        }
-    }
-    let sol_node_aux = sol_node.clone();
-    // Now print the Solution ;-)
-    println!("The path from the initial node with the accumulated weight"); 
-    while node != "F"{
-        if let Some(n) = sol_node.pop() {
-            node = n.to_string();
-            print!("{}", node);
-        }
-        if let Some(c) = sol_weight.pop() {
-            print!("---({})--->", c);
-        }
-    }
-    println!("");
-    
-    sol_node = sol_node_aux;
-    println!("The path from the initial node with the weight per node"); 
-    let mut node_parent: String;
-    if let Some(n) = sol_node.pop() {
-        node = n.to_string();
-    }
-    while node != "F"{
-        if let Some(n) = sol_node.pop() {
-            node_parent = node;
-            node = n.to_string();
-            print!("{}", node_parent);
-            if let Some(n) = g.get(&node_parent) {
-                if let Some(c) = n.get(&node) {
+            while node != "S" {
+                if let Some(c) = costs.get(&node.to_string()) {
+                    sol_weight.push(*c);
+                }
+                if let Some(p) = parents.get(&node.to_string()) {
+                    node = p.to_string();
+                    sol_node.push(node.clone());
+                }
+            }
+            let sol_node_aux = sol_node.clone();
+            // Now print the Solution ;-)
+            println!("The path from the initial node with the accumulated weight");
+            while node != "F" {
+                if let Some(n) = sol_node.pop() {
+                    node = n.to_string();
+                    print!("{}", node);
+                }
+                if let Some(c) = sol_weight.pop() {
                     print!("---({})--->", c);
                 }
             }
+            println!("");
+
+            sol_node = sol_node_aux;
+            println!("The path from the initial node with the weight per node");
+            let mut node_parent: String;
+            if let Some(n) = sol_node.pop() {
+                node = n.to_string();
+            }
+            while node != "F" {
+                if let Some(n) = sol_node.pop() {
+                    node_parent = node;
+                    node = n.to_string();
+                    print!("{}", node_parent);
+                    if let Some(n) = g.get(&node_parent) {
+                        if let Some(c) = n.get(&node) {
+                            print!("---({})--->", c);
+                        }
+                    }
+                }
+            }
+            println!("{}", node);
         }
     }
-    println!("{}", node);
-    
 }
