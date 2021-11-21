@@ -1,7 +1,8 @@
 mod prelude {
     pub use bracket_lib::prelude::*;
-    pub const SCREEN_WIDTH: i32 = 10;
-    pub const SCREEN_HEIGHT: i32 = 10;
+    pub const SCREEN_WIDTH: i32 = 80;
+    pub const SCREEN_HEIGHT: i32 = 50;
+    pub const SIZE_SQUARE: isize= 10;
 }
 
 use prelude::*;
@@ -15,9 +16,63 @@ impl GameState for State {
     }
 }
 
+#[derive(Debug, Copy, Clone)]
+struct Coord {
+    c: isize,
+    r: isize,
+}
+
+fn index(c: Coord) -> isize {
+    return c.r*SIZE_SQUARE + c.c + 1
+}
+
+fn inside(c: &Coord) -> bool {
+    if c.c < 0 || c.c == SIZE_SQUARE || c.r < 0 || c.r == SIZE_SQUARE {
+        return false;
+    }
+    return true;
+}
+
+fn neighbors(c: Coord) -> Vec<Coord> {
+    let mut neighbors = vec![];
+    let mut neighbor: Coord = c;
+
+    neighbor.c -= 1;    // (c-1, r)
+    if inside(&neighbor) {
+        neighbors.push(neighbor);
+    }
+    neighbor.c += 2;    // (c+1, r)
+    if inside(&neighbor) {
+        neighbors.push(neighbor);
+    }
+    neighbor.c -= 1;    // (c, r)
+    neighbor.r -= 1;    // (c, r-1)
+    if inside(&neighbor) {
+        neighbors.push(neighbor);
+    }
+    neighbor.c += 2;    // (c, r+1)
+    if inside(&neighbor) {
+        neighbors.push(neighbor);
+    }
+    
+    neighbors
+}
+
+fn minimum(neighbors: Vec<Coord>) -> Coord {
+    let mut min: Coord = Coord {c:SIZE_SQUARE, r:SIZE_SQUARE};
+
+    for c in neighbors.iter() {
+        if index(*c) < index(min) {
+            min = *c;
+        }
+    }
+    
+    min
+}
+
 fn main() -> BError {
-    let col = 5;
-    let row = 5;
+    let col = SIZE_SQUARE as usize;
+    let row = SIZE_SQUARE as usize;
 
     let mut square_grid = vec![vec![0 as isize; col]; row];
 
