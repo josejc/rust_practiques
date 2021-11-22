@@ -18,8 +18,8 @@ impl GameState for State {
 
 #[derive(Debug, Copy, Clone)]
 struct Coord {
-    c: isize,
     r: isize,
+    c: isize,
 }
 
 fn index(c: Coord) -> isize {
@@ -33,36 +33,36 @@ fn inside(c: &Coord) -> bool {
     return true;
 }
 
-fn neighbors(c: Coord) -> Vec<Coord> {
+fn neighbors(grid: &Vec<Vec <isize>>, c: Coord) -> Vec<Coord> {
     let mut neighbors = vec![];
     let mut neighbor: Coord = c;
 
-    neighbor.c -= 1;    // (c-1, r)
-    if inside(&neighbor) {
+    neighbor.c -= 1;    // (r, c-1)
+    if inside(&neighbor) &&  (grid[neighbor.r as usize][neighbor.c as usize] == 0) {
         neighbors.push(neighbor);
     }
-    neighbor.c += 2;    // (c+1, r)
-    if inside(&neighbor) {
+    neighbor.c += 2;    // (r, c+1)
+    if inside(&neighbor) &&  (grid[neighbor.r as usize][neighbor.c as usize] == 0) {
         neighbors.push(neighbor);
     }
-    neighbor.c -= 1;    // (c, r)
-    neighbor.r -= 1;    // (c, r-1)
-    if inside(&neighbor) {
+    neighbor.c -= 1;    // (r, c)
+    neighbor.r -= 1;    // (r-1, c)
+    if inside(&neighbor) &&  (grid[neighbor.r as usize][neighbor.c as usize] == 0) {
         neighbors.push(neighbor);
     }
-    neighbor.c += 2;    // (c, r+1)
-    if inside(&neighbor) {
+    neighbor.r += 2;    // (r+1, c)
+    if inside(&neighbor) &&  (grid[neighbor.r as usize][neighbor.c as usize] == 0) {
         neighbors.push(neighbor);
     }
     
     neighbors
 }
 
-fn minimum(neighbors: Vec<Coord>) -> Coord {
-    let mut min: Coord = Coord {c:SIZE_SQUARE, r:SIZE_SQUARE};
+fn minimum_empty(grid: &Vec<Vec<isize>>, neighbors: Vec<Coord>) -> Coord {
+    let mut min: Coord = neighbors[0];
 
     for c in neighbors.iter() {
-        if index(*c) < index(min) {
+        if (grid[c.r as usize][c.c as usize] == 0) && (index(*c) < index(min)) {
             min = *c;
         }
     }
@@ -70,15 +70,55 @@ fn minimum(neighbors: Vec<Coord>) -> Coord {
     min
 }
 
+fn print_square(grid: &Vec<Vec<isize>>) {
+    let mut col = SIZE_SQUARE as usize;
+    let mut row = col;
+
+    for i in 0..row {
+        println!("{:?}", grid[i]);
+    }
+}
+
 fn main() -> BError {
-    let col = SIZE_SQUARE as usize;
-    let row = SIZE_SQUARE as usize;
+    let mut col = SIZE_SQUARE as usize;
+    let mut row = col;
 
-    let mut square_grid = vec![vec![0 as isize; col]; row];
+    let mut square_grid = vec![vec![0 as isize; row]; col];
+    let ini: Coord = Coord {r: 0, c: 2};
+    let mut busy: isize = 0;
+    let mut next: Coord;
 
-    //square_grid[col][row] 0..col-1, 0..row-1
-    square_grid[2][2] = 5;
-    square_grid[1][4] = 1;
+    //square_grid[row][col] 0..row-1, 0..col-1
+    //print_square(&square_grid);
+    //println!("Neighbors: {:?}", neighbors(&square_grid, ini));
+    //println!("Minimum: {:?}", minimum_empty(&square_grid, neighbors(&square_grid, ini)));
+    col = ini.c as usize;
+    row = ini.r as usize;
+    square_grid[row][col] = 1;
+    //print_square(&square_grid);
+    busy += 1;
+    next = minimum_empty(&square_grid, neighbors(&square_grid, ini));
+    col = next.c as usize;
+    row = next.r as usize;
+    while square_grid[row][col] == 0 {
+        square_grid[row][col] = 1;
+        busy += 1;
+        //println!("Neighbors: {:?}", neighbors(&square_grid, next));
+        if neighbors(&square_grid, next).len() != 0 {
+            next = minimum_empty(&square_grid, neighbors(&square_grid, next));
+            //println!("Next: {:?}", next);
+        }
+        col = next.c as usize;
+        row = next.r as usize;
+        //println!("Square: {}", square_grid[row][col]);
+    }
+    print_square(&square_grid);
+    if busy == SIZE_SQUARE * SIZE_SQUARE {
+        println!("Square completed");
+    } else {
+        println!("Cells empty: {}", (SIZE_SQUARE * SIZE_SQUARE) - busy);
+    }
+
 
 
     let context = BTermBuilder::simple80x50()
