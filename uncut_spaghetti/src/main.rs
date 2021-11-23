@@ -33,36 +33,36 @@ fn inside(c: &Coord) -> bool {
     return true;
 }
 
-fn neighbors(grid: &Vec<Vec <isize>>, c: Coord) -> Vec<Coord> {
+fn neighbors(grid: &Vec<Vec <char>>, c: Coord) -> Vec<Coord> {
     let mut neighbors = vec![];
     let mut neighbor: Coord = c;
 
     neighbor.c -= 1;    // (r, c-1)
-    if inside(&neighbor) &&  (grid[neighbor.r as usize][neighbor.c as usize] == 0) {
+    if inside(&neighbor) &&  (grid[neighbor.r as usize][neighbor.c as usize] == '.') {
         neighbors.push(neighbor);
     }
     neighbor.c += 2;    // (r, c+1)
-    if inside(&neighbor) &&  (grid[neighbor.r as usize][neighbor.c as usize] == 0) {
+    if inside(&neighbor) &&  (grid[neighbor.r as usize][neighbor.c as usize] == '.') {
         neighbors.push(neighbor);
     }
     neighbor.c -= 1;    // (r, c)
     neighbor.r -= 1;    // (r-1, c)
-    if inside(&neighbor) &&  (grid[neighbor.r as usize][neighbor.c as usize] == 0) {
+    if inside(&neighbor) &&  (grid[neighbor.r as usize][neighbor.c as usize] == '.') {
         neighbors.push(neighbor);
     }
     neighbor.r += 2;    // (r+1, c)
-    if inside(&neighbor) &&  (grid[neighbor.r as usize][neighbor.c as usize] == 0) {
+    if inside(&neighbor) &&  (grid[neighbor.r as usize][neighbor.c as usize] == '.') {
         neighbors.push(neighbor);
     }
     
     neighbors
 }
 
-fn minimum_empty(grid: &Vec<Vec<isize>>, neighbors: Vec<Coord>) -> Coord {
+fn minimum_empty(grid: &Vec<Vec<char>>, neighbors: Vec<Coord>) -> Coord {
     let mut min: Coord = neighbors[0];
 
     for c in neighbors.iter() {
-        if (grid[c.r as usize][c.c as usize] == 0) && (index(*c) < index(min)) {
+        if (grid[c.r as usize][c.c as usize] == '.') && (index(*c) < index(min)) {
             min = *c;
         }
     }
@@ -70,7 +70,28 @@ fn minimum_empty(grid: &Vec<Vec<isize>>, neighbors: Vec<Coord>) -> Coord {
     min
 }
 
-fn print_square(grid: &Vec<Vec<isize>>) {
+// direction of the new neighbor, return '<', '>', 'v', '^'
+fn direction(org: Coord, next: Coord) -> char {
+    let mut d: char = 'X';
+
+    if org.r == next.r {
+        if org.c < next.c {
+            d = '>';
+        } else {
+            d = '<';
+        }
+    } else {
+        if org.r < next.r {
+            d = 'V';
+        } else {
+            d = '^';
+        }
+    }
+
+    d
+}
+
+fn print_square(grid: &Vec<Vec<char>>) {
     let mut col = SIZE_SQUARE as usize;
     let mut row = col;
 
@@ -83,10 +104,11 @@ fn main() -> BError {
     let mut col = SIZE_SQUARE as usize;
     let mut row = col;
 
-    let mut square_grid = vec![vec![0 as isize; row]; col];
+    let mut square_grid = vec![vec!['.'; row]; col];
     let ini: Coord = Coord {r: 0, c: 2};
     let mut busy: isize = 0;
-    let mut next: Coord;
+    let (mut old, mut next): (Coord, Coord);
+    let mut dir: char;
 
     //square_grid[row][col] 0..row-1, 0..col-1
     //print_square(&square_grid);
@@ -94,20 +116,23 @@ fn main() -> BError {
     //println!("Minimum: {:?}", minimum_empty(&square_grid, neighbors(&square_grid, ini)));
     col = ini.c as usize;
     row = ini.r as usize;
-    square_grid[row][col] = 1;
+    square_grid[row][col] = '#';
     //print_square(&square_grid);
     busy += 1;
     next = minimum_empty(&square_grid, neighbors(&square_grid, ini));
+    dir = direction(ini, next);
     col = next.c as usize;
     row = next.r as usize;
-    while square_grid[row][col] == 0 {
-        square_grid[row][col] = 1;
+    while square_grid[row][col] == '.' {
+        square_grid[row][col] = dir;
         busy += 1;
+        old = next;
         //println!("Neighbors: {:?}", neighbors(&square_grid, next));
         if neighbors(&square_grid, next).len() != 0 {
             next = minimum_empty(&square_grid, neighbors(&square_grid, next));
             //println!("Next: {:?}", next);
         }
+        dir = direction(old, next);
         col = next.c as usize;
         row = next.r as usize;
         //println!("Square: {}", square_grid[row][col]);
