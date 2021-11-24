@@ -145,7 +145,6 @@ fn main() -> BError {
     }
 
 
-
     let context = BTermBuilder::simple80x50()
         .with_title("Hello test")
         .build()?;
