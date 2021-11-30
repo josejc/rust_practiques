@@ -2,6 +2,8 @@ mod prelude {
     // Limits of maze must be odd
     pub const MAZE_ROW: isize= 11;
     pub const MAZE_COL: isize= 11;
+    pub use rand::thread_rng;
+    pub use rand::Rng;
 }
 
 use prelude::*;
@@ -54,23 +56,28 @@ fn print_square(grid: &Vec<Vec<char>>) {
     }
 }
 
-fn mark_all_walls_closed(m: &mut Vec<Vec<char>>) {
+// Wall status only has 2 status: O - open, C - Close
+fn mark_all_walls_closed(m: &mut Vec<Vec<char>>) -> Vec<Coord> {
     let rows = MAZE_ROW as usize;
     let cols = MAZE_COL as usize;
+    let mut set_rooms: Vec<Coord> = vec![];
 
-    for r in 0..rows {
+    for row in 0..rows {
         let i:usize;
-        if (r % 2) == 0 {
+        if (row % 2) == 0 {
             i = 1;
         } else {
             i = 0;
         }
-        for c in (i..cols).step_by(2) {
+        for col in (i..cols).step_by(2) {
             // C = CLOSED
-            m[r][c] = 'C';
+            m[row][col] = 'C';
+            let room: Coord = Coord{ r: row as isize, c: col as isize};
+            set_rooms.push(room);
         }
     }
 
+    set_rooms
 }
 
 // kind return the type of the cell whith a simple char
@@ -96,9 +103,17 @@ fn kind(c: &Coord) -> char {
 fn main() {
     let col = MAZE_COL as usize;
     let row = MAZE_ROW as usize;
+    let mut set_rooms: Vec<Coord>;
+    let mut path: Vec<Coord>;               // List of rooms
+    let mut walls: Vec<Coord>;              // List of walls
 
     let mut square_grid = vec![vec!['.'; row]; col];
 
-    mark_all_walls_closed(&mut square_grid);
+    set_rooms = mark_all_walls_closed(&mut square_grid);
     print_square(&square_grid);
+    println!("Set of rooms: {:?}", set_rooms); 
+    let index = thread_rng().gen_range(0..set_rooms.len());
+    let room = set_rooms.iter().nth(index).unwrap().clone();
+    //set_rooms.remove(&room);
+    println!("Random Room: {:?}", room);
 }
