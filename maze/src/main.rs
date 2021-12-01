@@ -57,10 +57,9 @@ fn print_square(grid: &Vec<Vec<char>>) {
 }
 
 // Wall status only has 2 status: O - open, C - Close
-fn mark_all_walls_closed(m: &mut Vec<Vec<char>>) -> Vec<Coord> {
+fn mark_all_walls_closed(m: &mut Vec<Vec<char>>) {
     let rows = MAZE_ROW as usize;
     let cols = MAZE_COL as usize;
-    let mut set_rooms: Vec<Coord> = vec![];
 
     for row in 0..rows {
         let i:usize;
@@ -72,6 +71,17 @@ fn mark_all_walls_closed(m: &mut Vec<Vec<char>>) -> Vec<Coord> {
         for col in (i..cols).step_by(2) {
             // C = CLOSED
             m[row][col] = 'C';
+        }
+    }
+}
+
+fn set_all_rooms() -> Vec<Coord> {
+    let mut set_rooms: Vec<Coord> = vec![];
+    let rows = MAZE_ROW as usize;
+    let cols = MAZE_COL as usize;
+
+    for row in (1..rows).step_by(2) {
+        for col in (1..cols).step_by(2) {
             let room: Coord = Coord{ r: row as isize, c: col as isize};
             set_rooms.push(room);
         }
@@ -100,6 +110,32 @@ fn kind(c: &Coord) -> char {
     return 'R';
 }
 
+// Find the rooms adjacent to the wall, checking neighbors cells
+fn rooms_adjacent(neighbors: Vec<Coord>) -> Vec<Coord> {
+    let mut rooms: Vec<Coord> = vec![];
+
+    for neighbor in neighbors.iter() {
+        if kind(neighbor) == 'R' {
+            rooms.push(*neighbor);
+        }
+    }
+
+    rooms
+}
+
+// Implementation Prim's Algorithm
+// 1. Mark all walls as closed.
+// 2. Select a room from the set of rooms, and add it to the "path".
+// 3. Add the four walls of the room to the "wall list". This is the list that we keep processing until it is empty.
+// 4. While the wall list is not empty:
+//      4.1 Select a wall from the list.
+//      4.2 Find the rooms adjacent to the wall.
+//      4.3 If there are two adjacent rooms, and exactly one of them is not in the path:
+//              4.3.1 Mark the wall as "Open".
+//              4.3.2 Add the unvisited room to the path.
+//              4.3.3 Add the walls adjacent to the unvisited room to the wall list.
+//      4.4 Remove the wall from the wall list.
+//
 fn main() {
     let col = MAZE_COL as usize;
     let row = MAZE_ROW as usize;
@@ -109,11 +145,21 @@ fn main() {
 
     let mut square_grid = vec![vec!['.'; row]; col];
 
-    set_rooms = mark_all_walls_closed(&mut square_grid);
+    mark_all_walls_closed(&mut square_grid);        // 1.
+    set_rooms = set_all_rooms();
     print_square(&square_grid);
     println!("Set of rooms: {:?}", set_rooms); 
-    let index = thread_rng().gen_range(0..set_rooms.len());
+    let index = thread_rng().gen_range(0..set_rooms.len());     // 2.
     let room = set_rooms.iter().nth(index).unwrap().clone();
-    //set_rooms.remove(&room);
+    set_rooms.remove(index);
     println!("Random Room: {:?}", room);
+    //println!("Set of rooms: {:?}", set_rooms); 
+    walls = neighbors(room);                                    // 3.
+    println!("Wall list: {:?}", walls);
+    while !walls.is_empty() {
+        let wall = walls.pop().unwrap();
+        println!("Wall: {:?}", wall);
+        let rooms_ad = rooms_adjacent(neighbors(wall));
+        println!("Rooms adjacent: {:?}", rooms_ad);
+    }
 }
