@@ -75,7 +75,8 @@ fn mark_all_walls_closed(m: &mut Vec<Vec<char>>) {
     }
 }
 
-fn set_all_rooms() -> Vec<Coord> {
+
+fn set_all_rooms(m: &mut Vec<Vec<char>>) -> Vec<Coord> {
     let mut set_rooms: Vec<Coord> = vec![];
     let rows = MAZE_ROW as usize;
     let cols = MAZE_COL as usize;
@@ -83,11 +84,24 @@ fn set_all_rooms() -> Vec<Coord> {
     for row in (1..rows).step_by(2) {
         for col in (1..cols).step_by(2) {
             let room: Coord = Coord{ r: row as isize, c: col as isize};
+            m[row][col] = 'R';
             set_rooms.push(room);
         }
     }
 
     set_rooms
+}
+
+
+fn set_all_pillars(m: &mut Vec<Vec<char>>) {
+    let rows = MAZE_ROW as usize;
+    let cols = MAZE_COL as usize;
+
+    for row in (0..rows).step_by(2) {
+        for col in (0..cols).step_by(2) {
+            m[row][col] = 'P';
+        }
+    }
 }
 
 // kind return the type of the cell whith a simple char
@@ -140,26 +154,29 @@ fn main() {
     let col = MAZE_COL as usize;
     let row = MAZE_ROW as usize;
     let mut set_rooms: Vec<Coord>;
-    let mut path: Vec<Coord>;               // List of rooms
-    let mut walls: Vec<Coord>;              // List of walls
+    let mut path: Vec<Coord> = vec![];                  // List of rooms
+    let mut walls: Vec<Coord>;                          // List of walls
 
     let mut square_grid = vec![vec!['.'; row]; col];
 
-    mark_all_walls_closed(&mut square_grid);        // 1.
-    set_rooms = set_all_rooms();
+    set_all_pillars(&mut square_grid);
+    mark_all_walls_closed(&mut square_grid);                    // 1.
+    set_rooms = set_all_rooms(&mut square_grid);
     print_square(&square_grid);
     println!("Set of rooms: {:?}", set_rooms); 
     let index = thread_rng().gen_range(0..set_rooms.len());     // 2.
     let room = set_rooms.iter().nth(index).unwrap().clone();
     set_rooms.remove(index);
+    path.push(room);
     println!("Random Room: {:?}", room);
     //println!("Set of rooms: {:?}", set_rooms); 
     walls = neighbors(room);                                    // 3.
     println!("Wall list: {:?}", walls);
-    while !walls.is_empty() {
-        let wall = walls.pop().unwrap();
+    while !walls.is_empty() {                                   // 4.
+        let wall = walls.pop().unwrap();                        // 4.1
         println!("Wall: {:?}", wall);
-        let rooms_ad = rooms_adjacent(neighbors(wall));
+        let rooms_ad = rooms_adjacent(neighbors(wall));         // 4.2
         println!("Rooms adjacent: {:?}", rooms_ad);
+        
     }
 }
