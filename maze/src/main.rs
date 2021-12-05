@@ -137,6 +137,22 @@ fn rooms_adjacent(neighbors: Vec<Coord>) -> Vec<Coord> {
     rooms
 }
 
+// Number of adjacent rooms in the path
+fn adjacent_rooms_path(path: &Vec<Coord>, neighbors: &Vec<Coord>) -> i32 {
+    let mut i: i32 = 0;
+    
+    for r in neighbors.iter() {
+        for p in path.iter() {
+            if (r.c == p.c) && (r.r == p.r) {
+                i += 1;
+                break;
+            }
+        }
+    }
+
+    i
+}
+
 // Implementation Prim's Algorithm
 // 1. Mark all walls as closed.
 // 2. Select a room from the set of rooms, and add it to the "path".
@@ -177,6 +193,7 @@ fn main() {
         println!("Wall: {:?}", wall);
         let rooms_ad = rooms_adjacent(neighbors(wall));         // 4.2
         println!("Rooms adjacent: {:?}", rooms_ad);
-        
+        println!("Number of adjacent rooms: {:?}", rooms_ad.len());
+        println!("Number of adjacent rooms in path: {:?}", adjacent_rooms_path(&path, &rooms_ad));    
     }
 }
