@@ -75,7 +75,6 @@ fn mark_all_walls_closed(m: &mut Vec<Vec<char>>) {
     }
 }
 
-
 fn set_all_rooms(m: &mut Vec<Vec<char>>) -> Vec<Coord> {
     let mut set_rooms: Vec<Coord> = vec![];
     let rows = MAZE_ROW as usize;
@@ -153,6 +152,33 @@ fn adjacent_rooms_path(path: &Vec<Coord>, neighbors: &Vec<Coord>) -> i32 {
     i
 }
 
+fn open_wall(w: Coord, grid: &mut Vec<Vec<char>>) {
+    grid[w.r as usize][w.c as usize] = 'O';
+}
+
+fn unvisited_room(path: &Vec<Coord>, rooms_ad: &Vec<Coord>) -> Coord {
+    let mut unvisited = Coord {r:MAZE_ROW, c:MAZE_COL};
+
+    for r in rooms_ad.iter() {
+        for p in path.iter() {
+            if (r.c == p.c) && (r.r == p.r) {
+                unvisited.c = r.c;
+                unvisited.r = r.r;
+                break;
+            }
+        }
+        if unvisited.c != MAZE_ROW {
+            break;
+        }
+    }
+
+    unvisited
+}
+
+fn add_walls(walls: &mut Vec<Coord>, neighbors: Vec<Coord>) {
+    // Case wall already exists in the vector? Rust? 
+}
+
 // Implementation Prim's Algorithm
 // 1. Mark all walls as closed.
 // 2. Select a room from the set of rooms, and add it to the "path".
@@ -193,7 +219,15 @@ fn main() {
         println!("Wall: {:?}", wall);
         let rooms_ad = rooms_adjacent(neighbors(wall));         // 4.2
         println!("Rooms adjacent: {:?}", rooms_ad);
-        println!("Number of adjacent rooms: {:?}", rooms_ad.len());
-        println!("Number of adjacent rooms in path: {:?}", adjacent_rooms_path(&path, &rooms_ad));    
+        //println!("Number of adjacent rooms: {:?}", rooms_ad.len());
+        //println!("Number of adjacent rooms in path: {:?}", adjacent_rooms_path(&path, &rooms_ad));    
+        if (rooms_ad.len() == 2) && 
+            (adjacent_rooms_path(&path, &rooms_ad) == 1) {      // 4.3
+            open_wall(wall, &mut square_grid);                  // 4.3.1
+            let unvisited = unvisited_room(&path, &rooms_ad);          
+            path.push(unvisited);                               // 4.3.2
+            add_walls(&mut walls, neighbors(unvisited));        // 4.3.3
+        }
+        // 4.4 When 4.1 do pop, the wall is eliminated from list
     }
 }
