@@ -152,31 +152,38 @@ fn adjacent_rooms_path(path: &Vec<Coord>, neighbors: &Vec<Coord>) -> i32 {
     i
 }
 
-fn open_wall(w: Coord, grid: &mut Vec<Vec<char>>) {
+fn open_wall(w: &Coord, grid: &mut Vec<Vec<char>>) {
     grid[w.r as usize][w.c as usize] = 'O';
 }
 
 fn unvisited_room(path: &Vec<Coord>, rooms_ad: &Vec<Coord>) -> Coord {
-    let mut unvisited = Coord {r:MAZE_ROW, c:MAZE_COL};
+    let mut unvisited = Coord {r: MAZE_ROW, c: MAZE_COL};
+    let mut found: bool = false;
 
     for r in rooms_ad.iter() {
         for p in path.iter() {
             if (r.c == p.c) && (r.r == p.r) {
-                unvisited.c = r.c;
-                unvisited.r = r.r;
+                found = true;
                 break;
             }
         }
-        if unvisited.c != MAZE_ROW {
+        if !found {
+            unvisited.r = r.r;
+            unvisited.c = r.c;
             break;
         }
     }
 
+    if unvisited.r == MAZE_ROW {
+        panic!("Error unvisited");
+    }
     unvisited
 }
 
 fn add_walls(walls: &mut Vec<Coord>, neighbors: Vec<Coord>) {
-    // Case wall already exists in the vector? Rust? 
+    let mut n = neighbors.clone();
+
+    walls.append(&mut n);
 }
 
 // Implementation Prim's Algorithm
@@ -215,9 +222,9 @@ fn main() {
     walls = neighbors(room);                                    // 3.
     println!("Wall list: {:?}", walls);
     while !walls.is_empty() {                                   // 4.
-        let wall = walls.pop().unwrap();                        // 4.1
+        let wall = walls.first().unwrap();                        // 4.1
         println!("Wall: {:?}", wall);
-        let rooms_ad = rooms_adjacent(neighbors(wall));         // 4.2
+        let rooms_ad = rooms_adjacent(neighbors(*wall));         // 4.2
         println!("Rooms adjacent: {:?}", rooms_ad);
         //println!("Number of adjacent rooms: {:?}", rooms_ad.len());
         //println!("Number of adjacent rooms in path: {:?}", adjacent_rooms_path(&path, &rooms_ad));    
@@ -228,6 +235,9 @@ fn main() {
             path.push(unvisited);                               // 4.3.2
             add_walls(&mut walls, neighbors(unvisited));        // 4.3.3
         }
-        // 4.4 When 4.1 do pop, the wall is eliminated from list
+        walls.remove(0);                                         // 4.4 
+        println!("Path: {:?}", path);
+        print_square(&square_grid);
     }
+    //print_square(&square_grid);
 }
