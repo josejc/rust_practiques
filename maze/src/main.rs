@@ -1,7 +1,7 @@
 mod prelude {
     // Limits of maze must be odd
-    pub const MAZE_ROW: isize= 11;
-    pub const MAZE_COL: isize= 11;
+    pub const MAZE_ROW: isize= 41;
+    pub const MAZE_COL: isize= 41;
     pub use rand::thread_rng;
     pub use rand::Rng;
 }
@@ -53,6 +53,24 @@ fn print_square(grid: &Vec<Vec<char>>) {
 
     for i in 0..row {
         println!("{:?}", grid[i]);
+    }
+}
+
+fn print_maze(grid: &Vec<Vec<char>>) {
+    let row = MAZE_ROW as usize;
+    let col = MAZE_COL as usize;
+    let mut maze = vec![vec!['▒'; row]; col];
+
+    for i in 0..row {
+        for j in 0..col {
+            if grid[i][j] == 'O' || grid[i][j] == 'R' {
+                maze[i][j] = ' ';
+            }
+        }
+    }
+    println!{"Maze:"};
+    for i in 0..row {
+        println!("{:?}", maze[i]);
     }
 }
 
@@ -171,6 +189,8 @@ fn unvisited_room(path: &Vec<Coord>, rooms_ad: &Vec<Coord>) -> Coord {
             unvisited.r = r.r;
             unvisited.c = r.c;
             break;
+        }  else {
+            found = false;
         }
     }
 
@@ -222,22 +242,25 @@ fn main() {
     walls = neighbors(room);                                    // 3.
     println!("Wall list: {:?}", walls);
     while !walls.is_empty() {                                   // 4.
-        let wall = walls.first().unwrap();                        // 4.1
+        let index = thread_rng().gen_range(0..walls.len());     
+        let wall = walls.iter().nth(index).unwrap().clone();    // 4.1
         println!("Wall: {:?}", wall);
-        let rooms_ad = rooms_adjacent(neighbors(*wall));         // 4.2
+        let rooms_ad = rooms_adjacent(neighbors(wall));         // 4.2
         println!("Rooms adjacent: {:?}", rooms_ad);
         //println!("Number of adjacent rooms: {:?}", rooms_ad.len());
         //println!("Number of adjacent rooms in path: {:?}", adjacent_rooms_path(&path, &rooms_ad));    
         if (rooms_ad.len() == 2) && 
             (adjacent_rooms_path(&path, &rooms_ad) == 1) {      // 4.3
-            open_wall(wall, &mut square_grid);                  // 4.3.1
+            open_wall(&wall, &mut square_grid);                  // 4.3.1
             let unvisited = unvisited_room(&path, &rooms_ad);          
+            println!("Unvisited: {:?}", unvisited);
             path.push(unvisited);                               // 4.3.2
             add_walls(&mut walls, neighbors(unvisited));        // 4.3.3
+            println!("Walls: {:?}", walls);
         }
-        walls.remove(0);                                         // 4.4 
+        walls.remove(index);                                         // 4.4 
         println!("Path: {:?}", path);
         print_square(&square_grid);
     }
-    //print_square(&square_grid);
+    print_maze(&square_grid);
 }
