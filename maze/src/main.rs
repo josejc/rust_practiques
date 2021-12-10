@@ -1,7 +1,8 @@
+#![warn(clippy::all, clippy::pedantic)]
 mod prelude {
     // Limits of maze must be odd
-    pub const MAZE_ROW: isize= 41;
-    pub const MAZE_COL: isize= 41;
+    pub const MAZE_ROW: isize= 59;
+    pub const MAZE_COL: isize= 101;
     pub use rand::thread_rng;
     pub use rand::Rng;
 }
@@ -59,18 +60,17 @@ fn print_square(grid: &Vec<Vec<char>>) {
 fn print_maze(grid: &Vec<Vec<char>>) {
     let row = MAZE_ROW as usize;
     let col = MAZE_COL as usize;
-    let mut maze = vec![vec!['▒'; row]; col];
 
     for i in 0..row {
+        let mut row_print = String::new();
         for j in 0..col {
             if grid[i][j] == 'O' || grid[i][j] == 'R' {
-                maze[i][j] = ' ';
+                row_print.push(' ');
+            } else {
+                row_print.push('▓');
             }
         }
-    }
-    println!{"Maze:"};
-    for i in 0..row {
-        println!("{:?}", maze[i]);
+        println!("{}", row_print);
     }
 }
 
@@ -213,7 +213,7 @@ fn add_walls(walls: &mut Vec<Coord>, neighbors: Vec<Coord>) {
 // 4. While the wall list is not empty:
 //      4.1 Select a wall from the list.
 //      4.2 Find the rooms adjacent to the wall.
-//      4.3 If there are two adjacent rooms, and exactly one of them is not in the path:
+//      4.3 If there are two adjacent rooms, and exactly one ofthem is not in the path:
 //              4.3.1 Mark the wall as "Open".
 //              4.3.2 Add the unvisited room to the path.
 //              4.3.3 Add the walls adjacent to the unvisited room to the wall list.
@@ -226,41 +226,40 @@ fn main() {
     let mut path: Vec<Coord> = vec![];                  // List of rooms
     let mut walls: Vec<Coord>;                          // List of walls
 
-    let mut square_grid = vec![vec!['.'; row]; col];
+    let mut square_grid = vec![vec!['.'; col]; row];
 
     set_all_pillars(&mut square_grid);
     mark_all_walls_closed(&mut square_grid);                    // 1.
     set_rooms = set_all_rooms(&mut square_grid);
     print_square(&square_grid);
-    println!("Set of rooms: {:?}", set_rooms); 
+    //println!("Set of rooms: {:?}", set_rooms); 
     let index = thread_rng().gen_range(0..set_rooms.len());     // 2.
     let room = set_rooms.iter().nth(index).unwrap().clone();
     set_rooms.remove(index);
     path.push(room);
-    println!("Random Room: {:?}", room);
+    //println!("Random Room: {:?}", room);
     //println!("Set of rooms: {:?}", set_rooms); 
     walls = neighbors(room);                                    // 3.
-    println!("Wall list: {:?}", walls);
+    //println!("Wall list: {:?}", walls);
     while !walls.is_empty() {                                   // 4.
         let index = thread_rng().gen_range(0..walls.len());     
         let wall = walls.iter().nth(index).unwrap().clone();    // 4.1
-        println!("Wall: {:?}", wall);
+        //println!("Wall: {:?}", wall);
         let rooms_ad = rooms_adjacent(neighbors(wall));         // 4.2
-        println!("Rooms adjacent: {:?}", rooms_ad);
+        //println!("Rooms adjacent: {:?}", rooms_ad);
         //println!("Number of adjacent rooms: {:?}", rooms_ad.len());
         //println!("Number of adjacent rooms in path: {:?}", adjacent_rooms_path(&path, &rooms_ad));    
         if (rooms_ad.len() == 2) && 
             (adjacent_rooms_path(&path, &rooms_ad) == 1) {      // 4.3
-            open_wall(&wall, &mut square_grid);                  // 4.3.1
+            open_wall(&wall, &mut square_grid);                 // 4.3.1
             let unvisited = unvisited_room(&path, &rooms_ad);          
-            println!("Unvisited: {:?}", unvisited);
+            //println!("Unvisited: {:?}", unvisited);
             path.push(unvisited);                               // 4.3.2
             add_walls(&mut walls, neighbors(unvisited));        // 4.3.3
-            println!("Walls: {:?}", walls);
+            //println!("Walls: {:?}", walls);
         }
-        walls.remove(index);                                         // 4.4 
-        println!("Path: {:?}", path);
-        print_square(&square_grid);
+        walls.remove(index);                                    // 4.4 
+        //println!("Path: {:?}", path);
+        print_maze(&square_grid);
     }
-    print_maze(&square_grid);
 }
